@@ -152,7 +152,7 @@
 		'functions_sprchannel' => [
 
 			'on'	=> true,									//true - włączona false - wyłączona
-			'cid'	=> 1,										//Strefa, w której ma sprawdzać kanały, które zawierają wulgaryzmy w nazwie.
+			'pid'	=> 1,										//Strefa, w której ma sprawdzać kanały, które zawierają wulgaryzmy w nazwie.
 
 		],
 
