@@ -16,7 +16,7 @@
 		die("Plik functions.class.php nie istnieje!");
 	}else{
 		require_once 'class/functions.class.php';
-		$funkcja = new funkcje();
+		$funkcja = new Funkcje();
 	}
 	if(!file_exists("class/ts3admin.class.php") == true) {
 		die("Plik ts3admin.class.php nie istnieje!");
@@ -34,6 +34,9 @@
 			$funkcja->setClientlist($tsAdmin->getElement('data', $tsAdmin->clientList("-groups -uid -times -ip")));
 			$funkcja->setServerinfo($tsAdmin->getElement('data', $tsAdmin->serverInfo()));
 			$funkcja->setConfig($config);
+			$funkcja->setTs3admin($tsAdmin);
+			$funkcja->setLang($l);
+			$funkcja->setDb($db);
 			
 			if($config['functions_admins_ts_online']['on'] == true) {
 				$funkcja->admins_ts_online();
@@ -57,7 +60,6 @@
 			if($config['functions_clean_channel']['on'] == true) {
 				$funkcja->channelCreate();
 			}
-
 			if($config['functions_ChannelNumber']['on'] == true) {
 				$funkcja->ChannelNumber();
 			}
