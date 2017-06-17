@@ -130,6 +130,7 @@
 
 		public function anty_vpn(): void
 		{
+			$aktualnie_online = [];
 			foreach($this->clientlist as $cl){
 				if($cl['client_type'] == 0) {
 					$aktualnie_online[$cl['clid']] = $cl['connection_client_ip'];
@@ -155,8 +156,10 @@
 		public function clean_channel(): void
 		{
 			$channellist = self::$tsAdmin->getElement('data', self::$tsAdmin->channelList("-topic -flags -voice -limits -icon"));
+			$i = 0;
 			foreach($channellist as $cl){
 				if($cl['pid'] == $this->config['functions_clean_channel']['pid']){
+					$i++;
 					if($cl['channel_topic'] != 'WOLNY' && $cl['channel_topic'] != date('d.m.Y')){
 						if(!empty(self::$tsAdmin->getElement('data', self::$tsAdmin->channelClientList($cl['cid'])))){
 							self::$tsAdmin->channelEdit($cl['cid'], array('channel_topic' => date('d.m.Y')));
