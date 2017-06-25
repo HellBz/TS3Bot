@@ -5,7 +5,7 @@
 * Dodanie możliwości ustawienia opisu kanału można podać %CLIENT_NICKNAME% - Nick właściciela %DATE% - Data założenia %HOUR% - Godzina założenia.
 * Dodano możliwość wyboru czy ma pukać administratora czy wysyłać prywatną wiadomość.
 * Poprawienie błędu, gdzie podczas zakładania kanału nie dodawało sub kanału.
-* Poprawienie błędu z odświeżaniem administracji online podziękowania za zgłoszenie dla Nasty.
+* Poprawienie błędu z odświeżaniem administracji online podziękowania za zgłoszenie dla Pir3x.
 * Poprawienie błędu z numerowaniem kanałów prywatnych podziękowanie za zgłoszenie dla Majako.
 * Inne drobne poprawki.
 Aktualizacja wymaga ponownego konfigurowania bota lub dodanie brakujących opcji w konofitu.
