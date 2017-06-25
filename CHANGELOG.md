@@ -8,6 +8,7 @@
 * Poprawienie błędu z odświeżaniem administracji online podziękowania za zgłoszenie dla Nasty.
 * Poprawienie błędu z numerowaniem kanałów prywatnych podziękowanie za zgłoszenie dla Majako.
 * Inne drobne poprawki.
+Aktualizacja wymaga ponownego konfigurowania bota lub dodanie brakujących opcji w konofitu.
 
 ## [2.0.4] - 17.06.2017
 * Poprawki w kodzie - dodanie elementów statycznych.
