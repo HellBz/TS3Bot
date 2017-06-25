@@ -1,6 +1,13 @@
 <?php
+	declare(strict_types=1);
 	set_time_limit(0);
 	ini_set('error_log', 'log/php_error.log');
+	/**
+	 * @author		Majcon
+	 * @email		Majcon94@gmail.com
+	 * @copyright	© 2016-2017 Majcon
+	 * @version		2.0
+	 **/
 	if(!file_exists("includes/config.php") == true) {
 		die("Plik config.php nie istnieje!");
 	}else{
@@ -29,18 +36,23 @@
 		$tsAdmin->login($config['server']['login'], $config['server']['password']);
 		$tsAdmin->selectServer($config['server']['port']);
 		$tsAdmin->setName($config['server']['nick']);
+		$funkcja->setConfig($config);
+		$funkcja->setDb($db);
+		$funkcja->setLang($l);
+		$funkcja->setTs3admin($tsAdmin);
 		do{
 			$whoami = $tsAdmin->getElement('data', $tsAdmin->whoAmI());
 			$funkcja->setClientlist($tsAdmin->getElement('data', $tsAdmin->clientList("-groups -uid -times -ip")));
 			$funkcja->setServerinfo($tsAdmin->getElement('data', $tsAdmin->serverInfo()));
-			$funkcja->setConfig($config);
-			$funkcja->setTs3admin($tsAdmin);
-			$funkcja->setLang($l);
-			$funkcja->setDb($db);
 			
+			if($config['functions_addRank']['on'] == true) {
+				$funkcja->addRank();
+			}
+
 			if($config['functions_admins_ts_online']['on'] == true) {
 				$funkcja->admins_ts_online();
 			}
+
 			if($config['functions_aktualna_data']['on'] == true) {
 				$funkcja->aktualna_data();
 			}
