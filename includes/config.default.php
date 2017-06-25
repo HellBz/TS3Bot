@@ -4,92 +4,105 @@
 
 		'server' => [
 
-			'login'		=> '', 									//ServerQuery Login
-			'password'	=> '',  								//ServerQuery password
-			'ip'		=> '127.0.0.1',  							//IP serwera
-			'port'		=> 9987, 								 //Server port
-			'queryport'	=> 10011, 								 //Query port
-			'nick'		=> 'Bot'  								//Nick bota na ts
+			'login'		=> '', 												//ServerQuery Login
+			'password'	=> '',  											//ServerQuery password
+			'ip'		=> '127.0.0.1',  									//IP serwera
+			'port'		=> 9987, 											//Server port
+			'queryport'	=> 10011, 											//Query port
+			'nick'		=> 'Bot'  											//Nick bota na ts
 
 		],
 
+	//addRank() Funkcja dodaje range po wejściu na kanało o podanym ID.
+		'functions_addRank' => [
+
+			'on'		=> true,											//true - włączona false - wyłączona
+			'cid_gid'	=> [
+			
+							1 => 2,
+							3 => 4
+							
+							]												//ID kanału, na który trzeba wejść wraz z ID rangi, którą ma nadać po wejściu. Tutaj 1 oraz 3 to ID kanału 2 oraz 4 ID rangi.
+
+		],
 	//admins_ts_online() Funkcja wyświetla listę administracji na kanale o podanym ID.
 		'functions_admins_ts_online' => [
 
-			'on'	=> true,									//true - włączona false - wyłączona
-			'cid'	=> 1,										//ID kanału, na którym ma być zmieniany opis.
+			'on'	=> true,												//true - włączona false - wyłączona
+			'cid'	=> 1,													//ID kanału, na którym ma być zmieniany opis.
 			'gid'	=> [
 
 				1	=> '[B][COLOR=#A12364]Admin[/COLOR][/B]',
 				2	=> '[B][COLOR=#460070]Mod[/COLOR][/B]',
 				3	=> '[B][COLOR=#7C08E8]KidMod[/COLOR][/B]'
 
-			]											//ID Grupy wraz z nazwą rangi.
+			]																//ID Grupy wraz z nazwą rangi.
 
 		],
 
 	//aktualna_data() Funkcja ustawia aktualną datę jako nazwa kanału o podanym ID.
 		'functions_aktualna_data' => [
 
-			'on'		=> true,								//true - włączona false - wyłączona
-			'cid'		=> 1,									//ID kanału, na którym ma ustawiać datę.
-			'format'	=> 'd.m.Y H:i'								//Format daty d - dzień m - miesiąc Y - rok H - godzina i - minuta s - sekunda
+			'on'		=> true,											//true - włączona false - wyłączona
+			'cid'		=> 1,												//ID kanału, na którym ma ustawiać datę.
+			'format'	=> 'd.m.Y H:i'										//Format daty d - dzień m - miesiąc Y - rok H - godzina i - minuta s - sekunda
 
 		],
 
 	//aktualnie_online() Funkcja ustawia aktualną liczbę osób online jako nazwa kanału o podanym ID.
 		'functions_aktualnie_online' => [
 
-			'on'	=> true,									//true - włączona false - wyłączona
-			'cid'	=> 1										//ID kanału, na którym ma ustawiać aktualną liczbę online.
+			'on'	=> true,												//true - włączona false - wyłączona
+			'cid'	=> 1													//ID kanału, na którym ma ustawiać aktualną liczbę online.
 
 		],
 
 	//anty_vpn() Funkcja wyrzuca użytkowników, którzy posiadają proxy.
 		'functions_anty_vpn' => [
 
-			'on'	=> true										//true - włączona false - wyłączona
+			'on'	=> true													//true - włączona false - wyłączona
 
 		],
 
 	//clean_channel() Funkcja czyści kanały, które nie są aktywne dłużej niż 7 dni w podanym sektorze.
 		'functions_clean_channel' => [
 
-			'on'	=> true,									//true - włączona false - wyłączona
-			'pid'	=> 1										//Strefa, w której ma sprawdzać kanały, które są nieaktywne.
+			'on'	=> true,												//true - włączona false - wyłączona
+			'pid'	=> 1													//Strefa, w której ma sprawdzać kanały, które są nieaktywne.
 
 		],
 
 	//channelCreate() Funkcja zakłada kanały w podanym sektorze.
 		'functions_channelCreate' => [
 
-			'on'		=> true,								//true - włączona false - wyłączona
-			'cid'		=> 1,									//ID kanału, na którego trzeba wejść, aby dostać kanał prywatny.
-			'pid'		=> 2,									//Strefa, w której ma zakładać kanały prywatne.
-			'ile'		=> 3,									//Liczba podkanałów.
-			'cid_move'	=> 4									//ID kanału, na który ma przenieść jeżeli użytkownik posiada już swój kanał.
+			'on'					=> true,								//true - włączona false - wyłączona
+			'cid'					=> 1,									//ID kanału, na którego trzeba wejść, aby dostać kanał prywatny.
+			'pid'					=> 2,									//Strefa, w której ma zakładać kanały prywatne.
+			'ile'					=> 3,									//Liczba podkanałów.
+			'channel_description'	=> '--------\n\nWłaściciel: %CLIENT_NICKNAME%\n\nData utworzenia: %DATE%\n\n--------',	//Opis, który ma ustawić można podać %CLIENT_NICKNAME% - Nick właściciela %DATE% -  Data założenia %HOUR% - Godzina założenia.
+			'cid_move'				=> 4									//ID kanału, na który ma przenieść jeżeli użytkownik posiada już swój kanał.
 
 		],
 		
 		'functions_ChannelNumber' => [
 
-			'on'		=> true,								//true - włączona false - wyłączona
-			'pid'		=> 1,									//Strefa, w której ma sprawdzać numery.
-			'separator'		=> '. '								//Separator oddzielający nazwę kanału od numeru.
+			'on'			=> true,										//true - włączona false - wyłączona
+			'pid'			=> 1,											//Strefa, w której ma sprawdzać numery.
+			'separator'		=> '. '											//Separator oddzielający nazwę kanału od numeru.
 
 		],
 
 	//log() Funkcja zapisuje logi z bota do pliku.
 		'functions_log' => [
 
-			'on'	=> true										//true - włączona false - wyłączona
+			'on'	=> true													//true - włączona false - wyłączona
 
 		],
 
 	//poke() Funkcja puka podane grupy jeżeli ktoś wbije na podany kanał.
 		'functions_poke' => [
 
-			'on'			=> true,							//true - włączona false - wyłączona
+			'on'			=> true,								//true - włączona false - wyłączona
 			'cid_gid'		=> [
 
 				1 => [
@@ -110,12 +123,13 @@
 
 				]
 
-			],											//ID Kanału, na który trzeba wejść, aby zaczepiło podane grupy.
+			],														//ID Kanału, na który trzeba wejść, aby zaczepiło podane grupy.
 			'cidafk' 		=> [
 
 				13, 14, 15
 
-			],											//Kanały, na których administrator może być AFK.
+			],														//Kanały, na których administrator może być AFK.
+			'poke_message'	=> 1,									//Wybór czy bot ma pukać czy wysyłać prywatną wiadomość do administratora 
 			'admin_time'	=> 120,									//Czas, po którym ma pukać administratora ponownie.
 			'user_time' 	=> 120									//Czas, po którym ma ponownie informować użytkownika.
 
