@@ -20,7 +20,7 @@
 
 		private static  $online_anty_vpn = [];
 
-		private static  $ChannelNumberTime = NULL;
+		private static  $ChannelNumberTime = 0;
 
 		private static  $czas_administracja_poke = [];
 
@@ -35,6 +35,7 @@
 		private static  $l = NULL;
 
 		private static  $db = NULL;
+
 
 
 
@@ -67,7 +68,33 @@
 		{
 			self::$db = $database;
 		}
-
+		
+		/**
+		 * addRank()
+		 * Funkcja dodaje range po wejściu na kanało o podanym ID.
+		 * @author	Majcon
+		 * @return	void
+		 **/
+		public function addRank(): void
+		{
+			foreach($this->config['functions_addRank']['cid_gid'] as $klucz => $value) {
+				$channelClientList = self::$tsAdmin->getElement('data', self::$tsAdmin->channelClientList($klucz, '-groups'));
+				if(!empty($channelClientList)){
+					foreach($channelClientList as $ccl){
+						$explode = explode(',', $ccl['client_servergroups']);
+						if(!in_array($value, $explode)){
+							self::$tsAdmin->serverGroupAddClient($value, $ccl['client_database_id']);
+						}
+					}
+				}
+			}
+		}
+		/**
+		 * admins_ts_online()
+		 * Funkcja wyświetla listę administracji na kanale o podanym ID.
+		 * @author	Majcon
+		 * @return	void
+		 **/
 		public function admins_ts_online(): void
 		{
 			$admin_list_online  = NULL;
@@ -84,6 +111,7 @@
 								$online = true;
 								$channel = self::$l->sprintf(self::$l->channel_admins_ts_online, $cl['cid'], $channelinfo['channel_name']);
 								$nick = self::$l->sprintf(self::$l->nick_admins_ts_online, $cl['client_database_id'], $cl['client_unique_identifier'], $cl['client_nickname']);
+								$admin_list_online .= $nick.$channel;
 								break;
 							}else{
 								$online = false;
@@ -91,7 +119,6 @@
 						}
 						if($online == true){
 							$ranga .= self::$l->sprintf(self::$l->admins_ts_online, $nick, $channel);
-							$admin_list_online .= $ranga;
 						}else{
 							$clientdbinfo = self::$tsAdmin->getElement('data', self::$tsAdmin->clientDbInfo($sgcl['cldbid']));
 							$data = $this->przelicz_czas(time()-$clientdbinfo['client_lastconnected']);
@@ -109,7 +136,13 @@
 				self::$admins_ts_online_time_edition = time()+60;
 			}
 		}
-
+		
+		/**
+		 * aktualna_data()
+		 * Funkcja ustawia aktualną datę jako nazwa kanału o podanym ID.
+		 * @author	Majcon
+		 * @return	void
+		 **/
 		public function aktualna_data(): void
 		{
 			$data = date($this->config['functions_aktualna_data']['format']);
@@ -119,6 +152,12 @@
 			}
 		}
 
+		/**
+		 * aktualnie_online()
+		 * Funkcja Funkcja ustawia aktualną liczbę osób online jako nazwa kanału o podanym ID.
+		 * @author	Majcon
+		 * @return	void
+		 **/
 		public function aktualnie_online(): void
 		{
 			$count = $this->serverinfo['virtualserver_clientsonline'] - $this->serverinfo['virtualserver_queryclientsonline'];
@@ -128,6 +167,12 @@
 			}
 		}
 
+		/**
+		 * anty_vpn()
+		 * Funkcja wyrzuca użytkowników, którzy posiadają proxy.
+		 * @author	Majcon
+		 * @return	void
+		 **/
 		public function anty_vpn(): void
 		{
 			$aktualnie_online = [];
@@ -152,7 +197,13 @@
 				self::$online_anty_vpn = $aktualnie_online;
 			}
 		}
-		
+
+		/**
+		 * clean_channel()
+		 * Funkcja czyści kanały, które nie są aktywne dłużej niż 7 dni w podanym sektorze.
+		 * @author	Majcon
+		 * @return	void
+		 **/
 		public function clean_channel(): void
 		{
 			$channellist = self::$tsAdmin->getElement('data', self::$tsAdmin->channelList("-topic -flags -voice -limits -icon"));
@@ -194,6 +245,14 @@
 			}
 		}
 
+		/**
+		 * cenzor()
+		 * Funkcja sprawdza czy string zawiera przekleństwo.
+		 * @param string $txt
+		 * @param int $add
+		 * @author	Majcon
+		 * @return	bool
+		 **/
 		private function cenzor($txt, $add): bool
 		{
 			$cenzor = array('bit(h|ch)', '(ch|h)(w|.w)(d|.d)(p|.p)', '(|o)cip', '(|o)(ch|h)uj(|a)', '(|do|na|po|do|prze|przy|roz|u|w|wy|za|z|matkojeb)jeb(|a|c|i|n|y)', '(|do|na|naw|od|pod|po|prze|przy|roz|spie|roz|poroz|s|u|w|za|wy)pierd(a|o)', 'fu(ck|k)', '/[^.]+\.[^.]+$/', "/^(\"|').+?\\1$/", '(|po|s|w|za)(ku|q)rw(i|y)', 'k(у|u)rw', 'k(у|u)tas', '(|po|wy)rucha', 'motherfucker', 'piczk', '(|w)pi(z|z)d');
@@ -207,7 +266,13 @@
 			}
 			return false;
 		}
-		
+
+		/**
+		 * channelCreate()
+		 * Funkcja zakłada kanały w podanym sektorze.
+		 * @author	Majcon
+		 * @return	void
+		 **/
 		public function channelCreate(): void
 		{
 			$channelClientList = self::$tsAdmin->getElement('data', self::$tsAdmin->channelClientList($this->config['functions_channelCreate']['cid'], "-ip"));
@@ -235,6 +300,9 @@
 					if($count == 0){
 						$zalozony = 0;
 						$id = 1;
+						$search = [ '%CLIENT_NICKNAME%', '%HOUR%', '%DATE%'	];
+						$replace = [ $ccl['client_nickname'], date('H:i'), date('d.m.Y') ];
+						$channel_description = str_replace($search, $replace, $channel_description);
 						$channellist = self::$tsAdmin->getElement('data', self::$tsAdmin->channelList('-topic'));
 						foreach($channellist as $chl){
 							if($chl['pid'] == $this->config['functions_channelCreate']['pid']){
@@ -244,7 +312,7 @@
 									$data1 = [
 										'channel_name' => $editid.'. '.$ccl['client_nickname'],
 										'channel_topic' => date('d.m.Y'),
-										'channel_description' => '',
+										'channel_description' => str_replace($search, $replace, $this->config['functions_channelCreate']['channel_description']),
 										'channel_flag_maxfamilyclients_unlimited' => 1,
 										'channel_flag_maxclients_unlimited' => 1,
 										'channel_maxclients' => '-1',
@@ -267,12 +335,12 @@
 							}
 						}
 						if($zalozony == 0){
-							$data = [ 'cpid' => $this->config['functions_channelCreate']['pid'], 'channel_name' => $id.'. '.$ccl['client_nickname'], 'channel_flag_permanent' => 1, 'channel_flag_maxclients_unlimited' => 1, 'channel_flag_maxfamilyclients_unlimited' => 1, 'channel_maxclients' => '-1', 'channel_maxfamilyclients' => '-1', 'channel_topic' => date('d.m.Y') ];
+							$data = [ 'cpid' => $this->config['functions_channelCreate']['pid'], 'channel_name' => $id.'. '.$ccl['client_nickname'], 'channel_description' => str_replace($search, $replace, $this->config['functions_channelCreate']['channel_description']), 'channel_flag_permanent' => 1, 'channel_flag_maxclients_unlimited' => 1, 'channel_flag_maxfamilyclients_unlimited' => 1, 'channel_maxclients' => '-1', 'channel_maxfamilyclients' => '-1', 'channel_topic' => date('d.m.Y') ];
 							$channelCreate = self::$tsAdmin->channelCreate($data);
 							if($this->config['functions_channelCreate']['ile'] != 0){
 								for($isub = 1; $isub <= $this->config['functions_channelCreate']['ile']; $isub++){
-									$data = array('cpid' => $channelCreate['cid'], 'channel_name' => $isub, 'channel_flag_permanent' => 1, 'channel_flag_maxclients_unlimited' => 1, 'channel_flag_maxfamilyclients_unlimited' => 1, 'channel_maxclients' => '-1', 'channel_maxfamilyclients' => '-1', 'channel_topic' => '');
-									self::$tsAdmin->channelCreate($data);
+									$data = [ 'cpid' => $channelCreate['data']['cid'], 'channel_name' => $isub, 'channel_flag_permanent' => 1, 'channel_flag_maxclients_unlimited' => 1, 'channel_flag_maxfamilyclients_unlimited' => 1, 'channel_maxclients' => '-1', 'channel_maxfamilyclients' => '-1', 'channel_topic' => '' ];
+									$test = self::$tsAdmin->channelCreate($data);
 								}
 							}
 							self::$tsAdmin->clientMove($ccl['clid'], $channelCreate['data']['cid']);
@@ -288,6 +356,12 @@
 			}
 		}
 
+		/**
+		 * ChannelNumber()
+		 * Funkcja sprawdza i w razie, czego poprawia numer kanału.
+		 * @author	Majcon
+		 * @return	void
+		 **/
 		public function ChannelNumber(): void
 		{
 			if(self::$ChannelNumberTime+10 < time()){
@@ -296,9 +370,18 @@
 				foreach($channellist as $chl){
 					if($chl['pid'] == $this->config['functions_ChannelNumber']['pid']){
 						$i++;
-						preg_match_all ("/(\d+)/is", $chl['channel_name'], $matches);
-						if(empty($matches[1][0]) || $matches[1][0] != $i){
+						preg_match_all('/(\d+)(.*)/is', $chl['channel_name'], $matches);
+						if(!empty($matches[1][0])){
+							if($matches[1][0] != $i){
+								$matches[2][0] = $matches[2][0] ?? NULL;
+								if(!empty($matches[2][0]) && $matches[2][0]{0} == trim($this->config['functions_ChannelNumber']['separator'])){
+									$matches[2][0] = trim(substr(trim($matches[2][0]), 1));
+								}
+								self::$tsAdmin->channelEdit($chl['cid'], ['channel_name' => $i.$this->config['functions_ChannelNumber']['separator'].$matches[2][0]]);
+							}
+						}else{
 							self::$tsAdmin->channelEdit($chl['cid'], ['channel_name' => $i.$this->config['functions_ChannelNumber']['separator'].$chl['channel_name']]);
+
 						}
 					}
 				}
@@ -306,6 +389,13 @@
 			}
 		}
 
+		/**
+		 * log()
+		 * Funkcja zamisuje logi
+		 * @param string $txt
+		 * @author	Majcon
+		 * @return	void
+		 **/
 		public function log($txt): void
 		{
 			if($this->config['functions_log']['on'] == true){
@@ -318,6 +408,15 @@
 			}
 		}
 
+		/**
+		 * padding_numbers()
+		 * @param int $number
+		 * @param string $t1
+		 * @param string $t2
+		 * @param string $t3
+		 * @author	Majcon
+		 * @return	void
+		 **/
 		private function padding_numbers($number, $t1, $t2, $t3): string
 		{
 			$number %= 100;
@@ -337,6 +436,12 @@
 			return $t3 ;
 		}
 
+		/**
+		 * poke()
+		 * Funkcja puka podane grupy jeżeli ktoś wbije na podany kanał.
+		 * @author	Majcon
+		 * @return	void
+		 **/
 		public function poke(): void
 		{
 			$administracja_po_poke = array();
@@ -376,7 +481,12 @@
 						if(!empty($administracja_poke)){
 							$nicki = implode(', ', $nicki);
 							foreach($administracja_poke as $ap){
-								self::$tsAdmin->clientPoke($ap, self::$l->sprintf(self::$l->success_admin_poke, $nicki));
+								if($this->config['functions_poke']['poke_message'] == 1){
+									self::$tsAdmin->clientPoke($ap, self::$l->sprintf(self::$l->success_admin_poke, $nicki));
+								}else{
+									self::$tsAdmin->sendMessage(1, $ap, self::$l->sprintf(self::$l->success_admin_poke, $nicki));
+								}
+								
 								self::$czas_administracja_poke[$ap] = time()+$this->config['functions_poke']['admin_time'];
 							}
 							if(self::$czas_informacji_poke[$channel][0] == 0){
@@ -409,6 +519,13 @@
 			}
 		}
 
+		/**
+		 * przelicz_czas()
+		 * Funkjca przelicza czas.
+		 * @param int $time
+		 * @author	Majcon
+		 * @return	array
+		 **/
 		private function przelicz_czas($time): array
 		{
 			$dni_r = $time / 86400;
@@ -422,7 +539,13 @@
 			$data['s']  = $rzg - $data['i'] * 60;
 			return $data;
 		}
-		
+
+		/**
+		 * register()
+		 * Funkcja automatycznie rejestruje użytkownika gdy on wbije na podane id kanału.
+		 * @author	Majcon
+		 * @return	void
+		 **/
 		public function register(): void
 		{
 			foreach($this->clientlist as $cl) {
@@ -442,6 +565,12 @@
 			}
 		}
 
+		/**
+		 * rekord_online()
+		 * Funkcja ustawia rekord osób online jako nazwa kanału o podanym ID.
+		 * @author	Majcon
+		 * @return	void
+		 **/
 		public function rekord_online(): void
 		{
 			$rekord = file_get_contents('includes/rekord.php');
@@ -452,7 +581,13 @@
 				$this->log('Ustanowiono rekord osób online: '.$count);
 			}
 		}
-		
+
+		/**
+		 * servername()
+		 * Funkcja ustawia nazwę serwera wraz z liczbą osób online.
+		 * @author	Majcon
+		 * @return	void
+		 **/
 		public function servername(): void
 		{
 			$count = $this->serverinfo['virtualserver_clientsonline'] - $this->serverinfo['virtualserver_queryclientsonline'];
@@ -462,6 +597,12 @@
 			}
 		}
 
+		/**
+		 * sprchannel()
+		 * Funkcja sprawdza nazwy kanału pod względem wulgaryzmów.
+		 * @author	Majcon
+		 * @return	void
+		 **/
 		public function sprchannel(): void
 		{
 			$channellist = self::$tsAdmin->getElement('data', self::$tsAdmin->channelList());
@@ -500,6 +641,12 @@
 			}
 		}
 
+		/**
+		 * sprnick()
+		 * Funkcja sprawdza nicki użytkowników pod względem wulgaryzmów.
+		 * @author	Majcon
+		 * @return	void
+		 **/
 		public function sprnick(): void
 		{
 			foreach($this->clientlist as $cl) {
@@ -512,7 +659,13 @@
 				}
 			}
 		}
-		
+
+		/**
+		 * update_activity()
+		 * Funkcja ustawia w opisie kanału o podanym ID TOP 10 aktywnych użytkowników.
+		 * @author	Majcon
+		 * @return	void
+		 **/
 		public function update_activity(): void
 		{
 			if(self::$update_activity_time <= time()){
@@ -547,6 +700,12 @@
 			}
 		}
 
+		/**
+		 * welcome_messege()
+		 * Funkcja wysyła wiadomość powitalną.
+		 * @author	Majcon
+		 * @return	void
+		 **/
 		public function welcome_messege(): void
 		{
 			$listOfUser = [];
@@ -578,8 +737,19 @@
 				self::$welcome_messege_list = $listOfUser;
 			}
 		}
-		
-		private function wyswietl_czas($data, $d=0, $h=0, $i=0, $s=0, $t=0):string
+
+		/**
+		 * wyswietl_czas()
+		 * Funkcja wyświetla czas.
+		 * @param array $data
+		 * @param int $d
+		 * @param int $h
+		 * @param int $i
+		 * @param int $t
+		 * @author	Majcon
+		 * @return	string
+		 **/
+		private function wyswietl_czas($data, $d=0, $h=0, $i=0, $s=0, $t=0): string
 		{
 			$txt_time = null;
 			if($d==1){
