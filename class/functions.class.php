@@ -302,7 +302,6 @@
 						$id = 1;
 						$search = [ '%CLIENT_NICKNAME%', '%HOUR%', '%DATE%'	];
 						$replace = [ $ccl['client_nickname'], date('H:i'), date('d.m.Y') ];
-						$channel_description = str_replace($search, $replace, $channel_description);
 						$channellist = self::$tsAdmin->getElement('data', self::$tsAdmin->channelList('-topic'));
 						foreach($channellist as $chl){
 							if($chl['pid'] == $this->config['functions_channelCreate']['pid']){
