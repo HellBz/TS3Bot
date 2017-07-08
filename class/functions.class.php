@@ -650,7 +650,7 @@
 		{
 			foreach($this->clientlist as $cl) {
 				if(!array_intersect(explode(',', $cl['client_servergroups']), $this->config['functions_sprnick']['gid'])){
-					if($this->cenzor($cl['client_nickname'], 0) == true){
+					if($this->cenzor($cl['client_nickname'], 1) == true){
 						self::$tsAdmin->clientPoke($cl['clid'], self::$l->poke_sprnick);
 						self::$tsAdmin->clientKick($cl['clid'], "server", self::$l->kick_sprnick);
 						$this->log('Wyrzucono użytkownika za wulgarny nick (client unique identifier: '.$cl['client_unique_identifier'].')');
