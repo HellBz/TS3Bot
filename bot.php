@@ -109,7 +109,7 @@
 			sleep(1);
 		}while($whoami['virtualserver_status'] == 'online');
 	}else{
-		$function->log('Connection could not be established.');
+		$funkcja->log('Connection could not be established.');
 	}
 	$tsAdmin->logout();
 ?>
