@@ -76,15 +76,16 @@
 				$funkcja->ChannelNumber();
 			}
 
-			if($config['functions_poke']['on'] == true) {
-				$funkcja->poke();
-			}
 			if($config['functions_register']['on'] == true) {
 				$funkcja->register();
 			}
 
 			if($config['functions_rekord_online']['on'] == true) {
 				$funkcja->rekord_online();
+			}
+
+			if($config['functions_sendAd']['on'] == true) {
+				$funkcja->sendAd();
 			}
 
 			if($config['functions_servername']['on'] == true) {
@@ -97,6 +98,22 @@
 
 			if($config['functions_sprnick']['on'] == true) {
 				$funkcja->sprnick();
+			}
+
+			if($config['functions_statusTwitch']['on'] == true) {
+				$funkcja->statusTwitch();
+			}
+
+			if($config['functions_poke']['on'] == true) {
+				$funkcja->poke();
+			}
+
+			if($config['functions_top_connections']['on'] == true) {
+				$funkcja->top_connections();
+			}
+
+			if($config['functions_top_connections_time']['on'] == true) {
+				$funkcja->top_connection_time();
 			}
 
 			if($config['functions_update_activity']['on'] == true) {
