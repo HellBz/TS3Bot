@@ -8,33 +8,47 @@
 
 		private $config = null;
 
-		private static  $welcome_messege_list = [];
+		private static $welcome_messege_list = [];
 
-		private static  $older_admin_list = NULL;
+		private static $older_admin_list = NULL;
 
-		private static  $admins_ts_online_time_edition = NULL;
+		private static $admins_ts_online_time_edition = NULL;
 
-		private static  $aktualna_data = NULL;
+		private static $aktualna_data = NULL;
 
-		private static  $aktualnie_online = NULL;
+		private static $aktualnie_online = NULL;
 
-		private static  $online_anty_vpn = [];
+		private static $online_anty_vpn = [];
 
-		private static  $ChannelNumberTime = 0;
+		private static $ChannelNumberTime = 0;
 
-		private static  $czas_administracja_poke = [];
+		private static $czas_administracja_poke = [];
 
-		private static  $czas_informacji_poke = [];
+		private static $czas_informacji_poke = [];
 
-		private static  $servername_online = 0;
+		private static $sendAd_time = 0;
 
-		private static  $update_activity_time = 0;
+		private static $servername_online = 0;
 
-		private static  $tsAdmin = NULL;
+		private static $statusTwitch_time = 0;
+		
+		private static $online_top_connections = [];
 
-		private static  $l = NULL;
+		private static $old_top  = NULL;
+		
+		private static $edit_top_connections = 0;
 
-		private static  $db = NULL;
+		private static $update_connection_time = 0;
+
+		private static $old_top_connection_time = NULL;
+
+		private static $update_activity_time = 0;
+
+		private static $tsAdmin = NULL;
+
+		private static $l = NULL;
+
+		private static $db = NULL;
 
 
 
@@ -177,7 +191,7 @@
 		{
 			$aktualnie_online = [];
 			foreach($this->clientlist as $cl){
-				if($cl['client_type'] == 0) {
+				if($cl['client_type'] == 0 && !in_array($cl['client_unique_identifier'], $this->config['functions_anty_vpn']['client_unique_identifier'])) {
 					$aktualnie_online[$cl['clid']] = $cl['connection_client_ip'];
 				}
 			}
@@ -185,8 +199,13 @@
 			if(!empty($array_diff)){
 				foreach($array_diff as $key => $value){
 					if(!empty($value)){
-						$jdc = json_decode(file_get_contents('http://legacy.iphub.info/api.php?showtype=4&ip='.$value));
-						if($jdc->proxy == 1){
+						$ch = curl_init();
+						curl_setopt_array($ch, [
+							CURLOPT_URL => "http://v2.api.iphub.info/ip/{$value}",
+							CURLOPT_RETURNTRANSFER => true,
+							CURLOPT_HTTPHEADER => ["X-Key: {$this->config['functions_anty_vpn']['key']}"]
+						]);
+						if(json_decode(curl_exec($ch))->block == 1){
 							$clientInfo = self::$tsAdmin->getElement('data', self::$tsAdmin->clientInfo($key));
 							self::$tsAdmin->clientKick($key, 'server', self::$l->success_kick_anty_vpn);
 							$this->log('Wyrzucono (client_nickname: '.$clientInfo['client_nickname'].') za używanie VPN.');
@@ -376,10 +395,10 @@
 								if(!empty($matches[2][0]) && $matches[2][0]{0} == trim($this->config['functions_ChannelNumber']['separator'])){
 									$matches[2][0] = trim(substr(trim($matches[2][0]), 1));
 								}
-								self::$tsAdmin->channelEdit($chl['cid'], ['channel_name' => $i.$this->config['functions_ChannelNumber']['separator'].$matches[2][0]]);
+								self::$tsAdmin->channelEdit($chl['cid'], ['channel_name' => substr($i.$this->config['functions_ChannelNumber']['separator'].$matches[2][0]], 0, 40));
 							}
 						}else{
-							self::$tsAdmin->channelEdit($chl['cid'], ['channel_name' => $i.$this->config['functions_ChannelNumber']['separator'].$chl['channel_name']]);
+							self::$tsAdmin->channelEdit($chl['cid'], ['channel_name' => substr($i.$this->config['functions_ChannelNumber']['separator'].$chl['channel_name']], 0, 2));
 
 						}
 					}
@@ -582,11 +601,40 @@
 		}
 
 		/**
+		 * sendAd()
+		 * Funkcja wysyła losową wiadomość na serwerze co określony czas.
+		 * @author	Majcon
+		 * @return	void
+		 **/
+		public function sendAd(): void
+		{
+			if(self::$sendAd_time <= time()){
+				$array_rand = $this->config['functions_sendAd']['txt_group'][array_rand($this->config['functions_sendAd']['txt_group'])];
+				foreach($array_rand as $key => $value) {
+					$txt = $key;
+					$group = $value;
+				}
+				if($group[0] == -1){
+					self::$tsAdmin->sendMessage(3, 1, $txt);
+				}else{
+					foreach($this->clientlist as $cl) {
+						if(array_intersect(explode(',', $cl['client_servergroups']), $group) || $group[0] == 0){
+							self::$tsAdmin->sendMessage(1, $cl['clid'], $txt);
+						}
+					}
+				}
+				self::$sendAd_time = time()+$this->config['functions_sendAd']['time']*60;
+			}
+		}
+
+
+		/**
 		 * servername()
 		 * Funkcja ustawia nazwę serwera wraz z liczbą osób online.
 		 * @author	Majcon
 		 * @return	void
 		 **/
+
 		public function servername(): void
 		{
 			$count = $this->serverinfo['virtualserver_clientsonline'] - $this->serverinfo['virtualserver_queryclientsonline'];
@@ -656,6 +704,124 @@
 						$this->log('Wyrzucono użytkownika za wulgarny nick (client unique identifier: '.$cl['client_unique_identifier'].')');
 					}
 				}
+			}
+		}
+
+		/**
+		 * statusTwitch()
+		 * Funkcja ustawia w opisie status na kanale twitch.
+		 * @author	Majcon
+		 * @return	void
+		 **/
+		public function statusTwitch(): void
+		{
+			if(self::$statusTwitch_time <= time()){
+				foreach($this->config['functions_statusTwitch']['cid_name'] as $cid => $name){
+					$jdc = json_decode(file_get_contents('https://api.twitch.tv/kraken/streams/'.$name.'?client_id=56o6gfj3nakgeaaqpku3cugkf7lgzk'));
+					if($jdc->stream == null){
+						$channel_description = self::$l->sprintf(self::$l->offline_statusTwitch, $name);
+						$channelinfo = self::$tsAdmin->getElement('data', self::$tsAdmin->channelInfo($cid));
+						if($channelinfo['channel_description'] != $channel_description){
+							self::$tsAdmin->channelEdit($cid, array('channel_description' => $channel_description));
+						}
+					}else{
+						$channel_description = self::$l->sprintf(self::$l->online_statusTwitch, $jdc->stream->channel->url, $name, $jdc->stream->game, $jdc->stream->channel->status, $jdc->stream->viewers, $jdc->stream->preview->medium);
+						self::$tsAdmin->channelEdit($cid, array('channel_description' => $channel_description));
+					}
+				}
+				self::$statusTwitch_time = time()+60;
+			}
+		}
+
+		/**
+		 * top_connections()
+		 * Funkcja ustawia w opisie kanału o podanym ID TOP 10 połączeń z serwerem.
+		 * @author	Majcon
+		 * @return	void
+		 **/
+		public function top_connections(): void
+		{
+			$aktualnie_online = [];
+			foreach($this->clientlist as $cl) {
+				if($cl['client_type'] == 0) {
+					$aktualnie_online[] = $cl['client_database_id'];
+				}
+			}
+			$array_diff = array_diff($aktualnie_online, self::$online_top_connections);
+			if(!empty($array_diff)){
+				foreach($array_diff as $ad) {
+					$clientdbinfo = self::$tsAdmin->getElement('data', self::$tsAdmin->clientDbInfo($ad));
+					$query = self::$db->query("SELECT COUNT(id) AS `count` FROM `top_connections` WHERE `cldbid` = {$ad} LIMIT 1");
+					while($row = $query->fetch()){
+						$count = $row['count'];
+					}
+					if($count == 0){
+						self::$db->query("INSERT INTO `top_connections` VALUES (NULL, {$clientdbinfo['client_database_id']}, '{$clientdbinfo['client_nickname']}', '{$clientdbinfo['client_unique_identifier']}', {$clientdbinfo['client_totalconnections']})");
+					}else{
+						self::$db->query("UPDATE `top_connections` SET `connections` = {$clientdbinfo['client_totalconnections']}, `client_nickname` = '{$clientdbinfo['client_nickname']}' WHERE `cldbid` = {$clientdbinfo['client_database_id']}");
+					}
+				}
+			}
+			self::$online_top_connections = $aktualnie_online;
+			$s = 0;
+			$top = NULL;
+			$pobierz_top = self::$db->query("SELECT * FROM `top_connections` ORDER BY `connections` DESC LIMIT 10");
+			while($pt = $pobierz_top->fetch()){
+				$s++;
+				$nick = "[B][URL=client://{$pt['cldbid']}/{$pt['cui']}]{$pt['client_nickname']}[/URL][/B]";
+				$top .= "[SIZE=10][COLOR=#ff0000][B]{$s}.)[/B][/COLOR] {$nick} {$pt['connections']}\n[/SIZE]";
+			}
+			if($top != self::$old_top){
+				self::$tsAdmin->channelEdit($this->config['functions_top_connections']['cid'], array('channel_description' => $top));
+				self::$old_top = $top;
+			}
+		}
+
+		/**
+		 * top_connections()
+		 * Funkcja ustawia w opisie kanału o podanym ID TOP 10 Najdłuższych połączeń z serwerem.
+		 * @author	Majcon
+		 * @return	void
+		 **/
+		public function top_connection_time()
+		{
+			if(self::$update_connection_time <= time()){
+				foreach($this->clientlist as $cl){
+					$clientInfo = self::$tsAdmin->getElement('data', self::$tsAdmin->clientInfo($cl['clid']));
+					$query = self::$db->query("SELECT COUNT(id) AS `count`, `connected_time` FROM `top_connection_time` WHERE `cldbid` = {$cl['client_database_id']} LIMIT 1");
+					while($row = $query->fetch()){
+						$count = $row['count'];
+						$connected_time = $row['connected_time'];
+					}
+					if($count == 0){
+						self::$db->query("INSERT INTO `top_connection_time` VALUES (NULL, {$cl['client_database_id']}, '{$cl['client_nickname']}', '{$cl['client_unique_identifier']}', {$clientInfo['connection_connected_time']})");
+					}else{
+						if($connected_time < $clientInfo['connection_connected_time']){
+							self::$db->query("UPDATE `top_connection_time` SET `connected_time` = {$clientInfo['connection_connected_time']}, `client_nickname` = '{$cl['client_nickname']}' WHERE `cldbid` = {$cl['client_database_id']}");
+						}
+					}
+				}
+				self::$update_connection_time = time()+60;
+			}
+			if(self::$edit_top_connections <= time()){
+				$s = 0;
+				$top = NULL;
+				if(!empty($this->config['functions_top_connections_time']['cldbid'])){
+					$cldbid = implode(",", $this->config['functions_top_connections_time']['cldbid']);
+				}
+				$pobierz_top = self::$db->query("SELECT * FROM `top_connection_time` WHERE `cldbid` NOT IN({$cldbid}) ORDER BY `connected_time` DESC LIMIT 10");
+				while($pt = $pobierz_top->fetch()){
+					$s++;
+					$data = $this->przelicz_czas($pt['connected_time']/1000);
+					$data = $this->wyswietl_czas($data, 1, 1, 1, 0, 0);
+					$nick = "[B][URL=client://{$pt['cldbid']}/{$pt['cui']}]{$pt['client_nickname']}[/URL][/B]";
+					$top .= "[SIZE=10][COLOR=#ff0000][B]{$s}.)[/B][/COLOR] {$nick} {$data}\n[/SIZE]";
+				}
+				if($top != self::$old_top_connection_time){
+					self::$tsAdmin->channelEdit($this->config['functions_top_connections_time']['cid'], array('channel_description' => $top));
+					self::$old_top_connection_time = $top;
+				}
+				self::$edit_top_connections = time()+300;
 			}
 		}
 
