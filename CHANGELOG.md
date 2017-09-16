@@ -1,7 +1,16 @@
 # Changelog
 
+## [2.1.1] - 17.09.2017
+* Dodanie funkcji sendAd(), która wysyła losową wiadomość
+* Dodanie funkcji statusTwitch(), która ustawia w opisie status na kanale twitch.
+* Dodano TOP 10 najdłuższe połączenie oraz TOP 10 najwięcej połączeń.
+* Zmiana API do AntyVPN
+* Kilka drobnych poprawek
+Aktualizacja wymaga ponownego konfigurowania bota lub dodanie brakujących opcji w konofitu oraz wykonania pliku update.php.
+Wystarczy wpisać php update.php.
+
 ## [2.0.6] - 25.06.2017
-* Dodanie funkcji ad drank (), która ustawia rangę po wejściu na kanał.
+* Dodanie funkcji addrank(), która ustawia rangę po wejściu na kanał.
 * Dodanie możliwości ustawienia opisu kanału można podać %CLIENT_NICKNAME% - Nick właściciela %DATE% - Data założenia %HOUR% - Godzina założenia.
 * Dodano możliwość wyboru czy ma pukać administratora czy wysyłać prywatną wiadomość.
 * Poprawienie błędu, gdzie podczas zakładania kanału nie dodawało sub kanału.
