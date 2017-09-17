@@ -38,7 +38,11 @@
 	//sprnick();
 	$lang['poke_sprnick'] = "Prosimy o zmianę nicku. Dziękujemy.";
 	$lang['kick_sprnick'] = "Prosimy o zmianę nicku. Dziękujemy.";
-	
+
+	//statusTwitch()
+	$lang['online_statusTwitch'] = "[size=14][COLOR=#4b367c]Bazwa:[/color] [URL={1}][color=#00aa00]{2}[/color][/URL]\n[COLOR=#4b367c]Status:[/color] [color=#00aa00]Online[/color]\n[COLOR=#4b367c]Obecna gra:[/color] {3}\n[COLOR=#4b367c]Tytuł:[/color] {4}\n[COLOR=#4b367c]Oglądających:[/color] {5}\n[img]{6}[/img]";
+	$lang['offline_statusTwitch'] = "[size=14][COLOR=#4b367c]Bazwa:[/color] [URL=https://www.twitch.tv/{1}][color=#00aa00]{1}[/color][/URL]\n[COLOR=#4b367c]Status:[/color] [color=#ff0000]Offline[/color][/size]";
+
 	//wyswietl_czas();
 	$lang['time_d1_wyswietl_czas'] = "Dnień.";
 	$lang['time_d2_wyswietl_czas'] = "Dni.";
