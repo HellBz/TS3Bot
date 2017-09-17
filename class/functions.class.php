@@ -398,7 +398,7 @@
 								self::$tsAdmin->channelEdit($chl['cid'], ['channel_name' => substr($i.$this->config['functions_ChannelNumber']['separator'].$matches[2][0], 0, 40)]);
 							}
 						}else{
-							self::$tsAdmin->channelEdit($chl['cid'], ['channel_name' => substr($i.$this->config['functions_ChannelNumber']['separator'].$chl['channel_name'], 0, 2)]);
+							self::$tsAdmin->channelEdit($chl['cid'], ['channel_name' => substr($i.$this->config['functions_ChannelNumber']['separator'].$chl['channel_name'], 0, 40)]);
 
 						}
 					}
