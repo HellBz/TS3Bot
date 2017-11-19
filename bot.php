@@ -1,4 +1,4 @@
-<?php
+v<?php
 	declare(strict_types=1);
 	set_time_limit(0);
 	ini_set('error_log', 'log/php_error.log');
@@ -69,7 +69,7 @@
 				$funkcja->clean_channel();
 			}
 
-			if($config['functions_clean_channel']['on'] == true) {
+			if($config['functions_channelCreate']['on'] == true) {
 				$funkcja->channelCreate();
 			}
 			if($config['functions_ChannelNumber']['on'] == true) {
