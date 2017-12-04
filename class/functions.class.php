@@ -765,15 +765,12 @@
 			if(self::$statusYt_time <= time()){
 				foreach($this->config['functions_statusYt']['cid_id'] as $cid => $id){
 					$jdc = json_decode(file_get_contents("https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id={$id}&key={$this->config['functions_statusYt']['key']}"));
-					$channel_description = "[size=14][color=#ff0000]Nazwa:[/color] [URL=https://www.youtube.com/channel/".$jdc->items[0]->id."]".$jdc->items[0]->snippet->title."[/URL]";
-					$channel_description .= "\n[color=#ff0000]Subskrypcji:[/color] ".$jdc->items[0]->statistics->subscriberCount;
-					$channel_description .= "\n[color=#ff0000]Wyświetlenia:[/color] ".$jdc->items[0]->statistics->viewCount;
-					$channel_description .= "\n[color=#ff0000]Opis:[/color] ".$jdc->items[0]->snippet->description;
-					$channel_description .= "[/size]";
-					$channel_name = $jdc->items[0]->snippet->title.' ('.$jdc->items[0]->statistics->subscriberCount.')';
+					$channel_description = self::$l->sprintf(self::$l->channel_description_statusYt, $jdc->items[0]->id, $jdc->items[0]->snippet->title, $jdc->items[0]->statistics->subscriberCount, $jdc->items[0]->statistics->viewCount, $jdc->items[0]->snippet->description);
+					$channel_name = self::$l->sprintf(self::$l->channel_name_statusYt, $jdc->items[0]->snippet->title, $jdc->items[0]->statistics->subscriberCount);
 					self::$tsAdmin->channelEdit($cid, [ 'channel_name' => $channel_name ]);
-					if(self::$statusYt_description != $channel_description){
+					if(self::$statusYt_description[$cid] != $channel_description){
 						self::$tsAdmin->channelEdit($cid, [ 'channel_description' => $channel_description ]);
+						self::$statusYt_description[$cid] = $channel_description;
 					}
 				}
 				self::$statusYt_time = time()+60;
