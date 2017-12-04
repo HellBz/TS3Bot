@@ -31,6 +31,10 @@
 		private static $servername_online = 0;
 
 		private static $statusTwitch_time = 0;
+
+		private static $statusYt_time = 0;
+
+		private static $statusYt_description = NULL;
 		
 		private static $online_top_connections = [];
 
@@ -244,7 +248,7 @@
 						$czas = strtotime($cl['channel_topic']);
 						if($czas <= $czas_del){
 							self::$db->query("DELETE FROM `channel` WHERE `cid` = {$cl['cid']}");
-							$data = array('channel_name' => $i.'. WOLNY', 'channel_topic' => 'WOLNY', 'channel_description' => '', 'channel_flag_maxfamilyclients_unlimited' => 0, 'channel_flag_maxclients_unlimited' => 0, 'channel_maxclients' => '0', 'channel_maxfamilyclients' => '0');
+							$data = [ 'channel_name' => $i.'. WOLNY', 'channel_topic' => 'WOLNY', 'channel_description' => '', 'channel_flag_maxfamilyclients_unlimited' => 0, 'channel_flag_maxclients_unlimited' => 0, 'channel_maxclients' => '0', 'channel_maxfamilyclients' => '0', 'channel_password' => '' ];
 							self::$tsAdmin->channelEdit($cl['cid'], $data);
 							foreach($channellist as $cl3){
 								if($cl3['pid'] == $cl['cid']){
@@ -334,7 +338,8 @@
 										'channel_flag_maxfamilyclients_unlimited' => 1,
 										'channel_flag_maxclients_unlimited' => 1,
 										'channel_maxclients' => '-1',
-										'channel_maxfamilyclients' => '-1'
+										'channel_maxfamilyclients' => '-1',
+										'channel_password' => ''
 									];
 									self::$tsAdmin->channelEdit($chl['cid'], $data1);
 									if($this->config['functions_channelCreate']['ile'] != 0){
@@ -353,11 +358,28 @@
 							}
 						}
 						if($zalozony == 0){
-							$data = [ 'cpid' => $this->config['functions_channelCreate']['pid'], 'channel_name' => $id.'. '.$ccl['client_nickname'], 'channel_description' => str_replace($search, $replace, $this->config['functions_channelCreate']['channel_description']), 'channel_flag_permanent' => 1, 'channel_flag_maxclients_unlimited' => 1, 'channel_flag_maxfamilyclients_unlimited' => 1, 'channel_maxclients' => '-1', 'channel_maxfamilyclients' => '-1', 'channel_topic' => date('d.m.Y') ];
+							$data = [
+								'cpid' => $this->config['functions_channelCreate']['pid'],
+								'channel_name' => $id.'. '.$ccl['client_nickname'],
+								'channel_description' => str_replace($search, $replace, $this->config['functions_channelCreate']['channel_description']),
+								'channel_topic' => date('d.m.Y'),
+								'channel_flag_permanent' => 1,
+								'channel_flag_maxclients_unlimited' => 1,
+								'channel_flag_maxfamilyclients_unlimited' => 1,
+								'channel_maxclients' => '-1', 'channel_maxfamilyclients' => '-1'
+							];
 							$channelCreate = self::$tsAdmin->channelCreate($data);
 							if($this->config['functions_channelCreate']['ile'] != 0){
 								for($isub = 1; $isub <= $this->config['functions_channelCreate']['ile']; $isub++){
-									$data = [ 'cpid' => $channelCreate['data']['cid'], 'channel_name' => $isub, 'channel_flag_permanent' => 1, 'channel_flag_maxclients_unlimited' => 1, 'channel_flag_maxfamilyclients_unlimited' => 1, 'channel_maxclients' => '-1', 'channel_maxfamilyclients' => '-1', 'channel_topic' => '' ];
+									$data = [
+										'cpid' => $channelCreate['data']['cid'],
+										'channel_name' => $isub, 'channel_flag_permanent' => 1,
+										'channel_topic' => '',
+										'channel_flag_maxclients_unlimited' => 1,
+										'channel_flag_maxfamilyclients_unlimited' => 1,
+										'channel_maxclients' => '-1',
+										'channel_maxfamilyclients' => '-1'
+									];
 									$test = self::$tsAdmin->channelCreate($data);
 								}
 							}
@@ -395,10 +417,10 @@
 								if(!empty($matches[2][0]) && $matches[2][0]{0} == trim($this->config['functions_ChannelNumber']['separator'])){
 									$matches[2][0] = trim(substr(trim($matches[2][0]), 1));
 								}
-								self::$tsAdmin->channelEdit($chl['cid'], ['channel_name' => substr($i.$this->config['functions_ChannelNumber']['separator'].$matches[2][0], 0, 40)]);
+								self::$tsAdmin->channelEdit($chl['cid'], ['channel_name' => $i.$this->config['functions_ChannelNumber']['separator'].$matches[2][0]]);
 							}
 						}else{
-							self::$tsAdmin->channelEdit($chl['cid'], ['channel_name' => substr($i.$this->config['functions_ChannelNumber']['separator'].$chl['channel_name'], 0, 40)]);
+							self::$tsAdmin->channelEdit($chl['cid'], ['channel_name' => $i.$this->config['functions_ChannelNumber']['separator'].$chl['channel_name']]);
 
 						}
 					}
@@ -451,7 +473,7 @@
 			if($number >1 && $number < 5){
 				return $t2;
 			}
-			return $t3 ;
+			return $t3;
 		}
 
 		/**
@@ -602,7 +624,7 @@
 
 		/**
 		 * sendAd()
-		 * Funkcja wysyła losową wiadomość na serwerze co określony czas.
+		 * Funkcja wysyła reklame co określony czas.
 		 * @author	Majcon
 		 * @return	void
 		 **/
@@ -623,7 +645,7 @@
 						}
 					}
 				}
-				self::$sendAd_time = time()+$this->config['functions_sendAd']['time']*60;
+				self::$sendAd_time = time()+$this->config['functions_sendAd']['time']*1;
 			}
 		}
 
@@ -634,7 +656,6 @@
 		 * @author	Majcon
 		 * @return	void
 		 **/
-
 		public function servername(): void
 		{
 			$count = $this->serverinfo['virtualserver_clientsonline'] - $this->serverinfo['virtualserver_queryclientsonline'];
@@ -709,7 +730,7 @@
 
 		/**
 		 * statusTwitch()
-		 * Funkcja ustawia w opisie status na kanale twitch.
+		 * Funkcja ustawia w opisie status twitch.
 		 * @author	Majcon
 		 * @return	void
 		 **/
@@ -730,6 +751,32 @@
 					}
 				}
 				self::$statusTwitch_time = time()+60;
+			}
+		}
+
+		/**
+		 * statusYt()
+		 * Funkcja liczbę subskrypcji w nazwie oraz podstawowe informacje w opisie.
+		 * @author	Majcon
+		 * @return	void
+		 **/
+		public function statusYt(): void
+		{
+			if(self::$statusYt_time <= time()){
+				foreach($this->config['functions_statusYt']['cid_id'] as $cid => $id){
+					$jdc = json_decode(file_get_contents("https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id={$id}&key={$this->config['functions_statusYt']['key']}"));
+					$channel_description = "[size=14][color=#ff0000]Nazwa:[/color] [URL=https://www.youtube.com/channel/".$jdc->items[0]->id."]".$jdc->items[0]->snippet->title."[/URL]";
+					$channel_description .= "\n[color=#ff0000]Subskrypcji:[/color] ".$jdc->items[0]->statistics->subscriberCount;
+					$channel_description .= "\n[color=#ff0000]Wyświetlenia:[/color] ".$jdc->items[0]->statistics->viewCount;
+					$channel_description .= "\n[color=#ff0000]Opis:[/color] ".$jdc->items[0]->snippet->description;
+					$channel_description .= "[/size]";
+					$channel_name = $jdc->items[0]->snippet->title.' ('.$jdc->items[0]->statistics->subscriberCount.')';
+					self::$tsAdmin->channelEdit($cid, [ 'channel_name' => $channel_name ]);
+					if(self::$statusYt_description != $channel_description){
+						self::$tsAdmin->channelEdit($cid, [ 'channel_description' => $channel_description ]);
+					}
+				}
+				self::$statusYt_time = time()+60;
 			}
 		}
 
@@ -765,7 +812,7 @@
 			self::$online_top_connections = $aktualnie_online;
 			$s = 0;
 			$top = NULL;
-			$pobierz_top = self::$db->query("SELECT * FROM `top_connections` ORDER BY `connections` DESC LIMIT 10");
+			$pobierz_top = self::$db->query("SELECT * FROM `top_connections` ORDER BY `connections` DESC LIMIT {$this->config['functions_top_connections_time']['limit']}");
 			while($pt = $pobierz_top->fetch()){
 				$s++;
 				$nick = "[B][URL=client://{$pt['cldbid']}/{$pt['cui']}]{$pt['client_nickname']}[/URL][/B]";
@@ -778,12 +825,12 @@
 		}
 
 		/**
-		 * top_connections()
+		 * top_connection_time()
 		 * Funkcja ustawia w opisie kanału o podanym ID TOP 10 Najdłuższych połączeń z serwerem.
 		 * @author	Majcon
 		 * @return	void
 		 **/
-		public function top_connection_time()
+		public function top_connection_time(): void
 		{
 			if(self::$update_connection_time <= time()){
 				foreach($this->clientlist as $cl){
@@ -809,7 +856,7 @@
 				if(!empty($this->config['functions_top_connections_time']['cldbid'])){
 					$cldbid = implode(",", $this->config['functions_top_connections_time']['cldbid']);
 				}
-				$pobierz_top = self::$db->query("SELECT * FROM `top_connection_time` WHERE `cldbid` NOT IN({$cldbid}) ORDER BY `connected_time` DESC LIMIT 10");
+				$pobierz_top = self::$db->query("SELECT * FROM `top_connection_time` WHERE `cldbid` NOT IN({$cldbid}) ORDER BY `connected_time` DESC LIMIT {$this->config['functions_top_connections_time']['limit']}");
 				while($pt = $pobierz_top->fetch()){
 					$s++;
 					$data = $this->przelicz_czas($pt['connected_time']/1000);
@@ -852,7 +899,7 @@
 				if(!empty($this->config['functions_update_activity']['cldbid'])){
 					$cldbid = implode(",", $this->config['functions_update_activity']['cldbid']);
 				}
-				$pobierz_top = self::$db->query("SELECT * FROM `czas_przebywania` WHERE `cldbid` NOT IN({$cldbid}) ORDER BY `time` DESC LIMIT 10");
+				$pobierz_top = self::$db->query("SELECT * FROM `czas_przebywania` WHERE `cldbid` NOT IN({$cldbid}) ORDER BY `time` DESC LIMIT {$this->config['functions_top_connections_time']['limit']}");
 				while($pt = $pobierz_top->fetch()){
 					$s++;
 					$data = $this->przelicz_czas($pt['time'], 1);
