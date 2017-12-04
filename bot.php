@@ -30,6 +30,9 @@
 	}else{
 		require_once 'class/ts3admin.class.php';
 	}
+	if($config['bot']['ver'] < file_get_contents('http://51.254.119.80/ts3bot/ver.php')){
+		echo 'Korzystasz ze starej wersji bota zaktualizuj ją. ;)';
+	}
 	$db = new PDO('sqlite:ts3bot.sqlitedb');
 	$tsAdmin = new ts3admin($config['server']['ip'], $config['server']['queryport']);
 	if($tsAdmin->getElement('success', $tsAdmin->connect())) {
@@ -102,6 +105,10 @@
 
 			if($config['functions_statusTwitch']['on'] == true) {
 				$funkcja->statusTwitch();
+			}
+			
+			if($config['functions_statusYt']['on'] == true) {
+				$funkcja->statusYt();
 			}
 
 			if($config['functions_poke']['on'] == true) {
