@@ -1,7 +1,11 @@
 # Changelog
 
+## [2.2.1] - 04.12.2017
+* Dodanie funkcji statusYt(), która ustawia w opisie kanału takie informacje jak liczba subskrypcji, liczba wyświetleń oraz zmienia nazwę kanału na nick z liczbą subskrypcji.
+* Poprawienie kilku drobnych błędów.
+
 ## [2.1.1] - 17.09.2017
-* Dodanie funkcji sendAd(), która wysyła losową wiadomość
+* Dodanie funkcji sendAd(), która wysyła losową wiadomość.
 * Dodanie funkcji statusTwitch(), która ustawia w opisie status na kanale twitch.
 * Dodano TOP 10 najdłuższe połączenie oraz TOP 10 najwięcej połączeń.
 * Zmiana API do AntyVPN.
