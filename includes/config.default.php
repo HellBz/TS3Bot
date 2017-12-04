@@ -13,6 +13,12 @@
 
 		],
 
+		'bot' => [
+		
+			'ver'		=> '2.2.1'
+		
+		],
+
 		//addRank() Funkcja dodaje range po wejściu na kanało o podanym ID.
 		'functions_addRank' => [
 
@@ -202,20 +208,33 @@
 
 		],
 
-		//statusTwitch() Funkcja ustawia w opisie status na kanale twitch.
+	//statusTwitch() Funkcja ustawia w opisie status na kanale twitch.
 		'functions_statusTwitch' => [
 
-			'on'		=> false,						//true - włączona false - wyłączona
+			'on'		=> false,												//true - włączona false - wyłączona
 			'cid_name'	=> [
 
 				1 => 'Majcon',
 				2 => 'izakooo'
 
-			]											//ID kanału oraz nick na twitch.tv
+			]																	//ID kanału oraz nick na twitch.tv
 			
 		],
 
-		//top_connections() Funkcja ustawia w opisie kanału o podanym ID TOP 10 połączeń z serwerem.
+	//statusYt() Funkcja ustawia w opisie status na kanale twitch.
+		'functions_statusYt' => [
+
+			'on'		=> true,												//true - włączona false - wyłączona
+			'key'		=> 'AIzaSyDdCIT6ptA0fdvCb6CwE5-jbUUqHeKKJrY',			//Klucz api
+			'cid_id'	=> [
+
+				1 => 'UCb9PGfYb_Cv1ysuENPIAvRQ',
+
+			]																	//ID kanału oraz ID kanału
+			
+		],
+
+	//top_connections() Funkcja ustawia w opisie kanału o podanym ID TOP 10 połączeń z serwerem.
 		'functions_top_connections' => [
 
 			'on'		=> false,												//true - włączona false - wyłączona
@@ -223,7 +242,7 @@
 
 		],
 
-		//Funkcja ustawia w opisie kanału o podanym ID TOP 10 Najdłuższych połączeń z serwerem.
+	//Funkcja ustawia w opisie kanału o podanym ID TOP 10 Najdłuższych połączeń z serwerem.
 		'functions_top_connections_time' => [
 
 			'on'		=> false,
