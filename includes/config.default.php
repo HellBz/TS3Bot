@@ -96,7 +96,7 @@
 
 		],
 		
-	//channelCreate() Funkcja sprawdza i w razie, czego poprawia numer kanału.
+	//channelNumber() Funkcja sprawdza i w razie, czego poprawia numer kanału.
 		'functions_ChannelNumber' => [
 
 			'on'		=> false,								//true - włączona false - wyłączona
@@ -187,7 +187,7 @@
 		'functions_sprchannel' => [
 
 			'on'	=> false,									//true - włączona false - wyłączona
-			'pid'	=> 78,										//Strefa, w której ma sprawdzać kanały, które zawierają wulgaryzmy w nazwie.
+			'pid'	=> 1										//Strefa, w której ma sprawdzać kanały, które zawierają wulgaryzmy w nazwie.
 
 		],
 
@@ -224,11 +224,12 @@
 	//statusYt() Funkcja ustawia w opisie status na kanale twitch.
 		'functions_statusYt' => [
 
-			'on'		=> true,												//true - włączona false - wyłączona
+			'on'		=> false,												//true - włączona false - wyłączona
 			'key'		=> 'AIzaSyDdCIT6ptA0fdvCb6CwE5-jbUUqHeKKJrY',			//Klucz api
 			'cid_id'	=> [
 
 				1 => 'UCb9PGfYb_Cv1ysuENPIAvRQ',
+				2 => 'UCb9PGfYb_Cv1ysuENPIAvRQ'
 
 			]																	//ID kanału oraz ID kanału
 			
@@ -242,7 +243,7 @@
 
 		],
 
-	//Funkcja ustawia w opisie kanału o podanym ID TOP 10 Najdłuższych połączeń z serwerem.
+	//top_connection_time() Funkcja ustawia w opisie kanału o podanym ID TOP 10 Najdłuższych połączeń z serwerem.
 		'functions_top_connections_time' => [
 
 			'on'		=> false,
