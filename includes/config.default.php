@@ -240,6 +240,7 @@
 
 			'on'		=> false,												//true - włączona false - wyłączona
 			'cid'		=> 1,													//ID kanału, w którym ma ustawiać TOP 10 połączeń z serwerem.
+			'limit'		=> 20							//Limit osób, które ma wyświetlać w top.
 
 		],
 
@@ -252,7 +253,8 @@
 
 				1, 2, 3, 4, 5
 
-			]																	//Client database id użytkowników, których ma nie wyświetlać w topce np. MusicBOT czy też ten bot.
+			],																	//Client database id użytkowników, których ma nie wyświetlać w topce np. MusicBOT czy też ten bot.
+			'limit'		=> 20													//Limit osób, które ma wyświetlać w top.
 
 		],
 
@@ -265,7 +267,8 @@
 
 				1, 2, 3, 4, 5
 
-			]																	//Client database id użytkowników, których ma nie wyświetlać w topce np. MusicBOT czy też ten bot.
+			],																	//Client database id użytkowników, których ma nie wyświetlać w topce np. MusicBOT czy też ten bot.
+			'limit'		=> 20													//Limit osób, które ma wyświetlać w top.
 
 		],
 
