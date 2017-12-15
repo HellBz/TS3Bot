@@ -10,9 +10,11 @@
 
 		private static $welcome_messege_list = [];
 
-		private static $older_admin_list = NULL;
+		private static $older_groupOnline_name = [];
 
-		private static $admins_ts_online_time_edition = NULL;
+		private static $older_groupOnline = [];
+
+		private static $groupOnline_time_edition = 0;
 
 		private static $aktualna_data = NULL;
 
@@ -34,7 +36,7 @@
 
 		private static $statusYt_time = 0;
 
-		private static $statusYt_description = NULL;
+		private static $statusYt_description = [];
 		
 		private static $online_top_connections = [];
 
@@ -107,53 +109,6 @@
 				}
 			}
 		}
-		/**
-		 * admins_ts_online()
-		 * Funkcja wyświetla listę administracji na kanale o podanym ID.
-		 * @author	Majcon
-		 * @return	void
-		 **/
-		public function admins_ts_online(): void
-		{
-			$admin_list_online  = NULL;
-			$ranga = self::$l->heading_admins_ts_online;
-			foreach($this->config['functions_admins_ts_online']['gid'] as $klucz => $value) {
-				$servergroupclientlist =  self::$tsAdmin->getElement('data', self::$tsAdmin->serverGroupClientList($klucz, "-names"));
-				$servergroupclientlistarray_filter = array_filter($servergroupclientlist[0]);
-				if(!empty($servergroupclientlistarray_filter)){
-					$ranga .= self::$l->sprintf(self::$l->group_admins_ts_online, $value);
-					foreach($servergroupclientlist as $sgcl){
-						foreach($this->clientlist as $cl){
-						if($sgcl['cldbid'] == $cl['client_database_id']){
-								$channelinfo = self::$tsAdmin->getElement('data', self::$tsAdmin->channelInfo($cl['cid']));
-								$online = true;
-								$channel = self::$l->sprintf(self::$l->channel_admins_ts_online, $cl['cid'], $channelinfo['channel_name']);
-								$nick = self::$l->sprintf(self::$l->nick_admins_ts_online, $cl['client_database_id'], $cl['client_unique_identifier'], $cl['client_nickname']);
-								$admin_list_online .= $nick.$channel;
-								break;
-							}else{
-								$online = false;
-							}
-						}
-						if($online == true){
-							$ranga .= self::$l->sprintf(self::$l->admins_ts_online, $nick, $channel);
-						}else{
-							$clientdbinfo = self::$tsAdmin->getElement('data', self::$tsAdmin->clientDbInfo($sgcl['cldbid']));
-							$data = $this->przelicz_czas(time()-$clientdbinfo['client_lastconnected']);
-							$txt_time = $this->wyswietl_czas($data, 1, 1, 1, 0, 0);
-							$nick = self::$l->sprintf(self::$l->nick_admins_ts_online, $clientdbinfo['client_database_id'], $clientdbinfo['client_unique_identifier'], $clientdbinfo['client_nickname']);
-							$ranga .= self::$l->sprintf(self::$l->admins_ts_offline, $nick, $txt_time);
-						}
-					}
-					$ranga .= self::$l->size_admins_ts_online;
-				}
-			}
-			if(self::$older_admin_list != $admin_list_online || self::$admins_ts_online_time_edition+60 < time()){
-				self::$tsAdmin->channelEdit($this->config['functions_admins_ts_online']['cid'], array('channel_description' => $ranga));
-				self::$older_admin_list = $admin_list_online;
-				self::$admins_ts_online_time_edition = time()+60;
-			}
-		}
 		
 		/**
 		 * aktualna_data()
@@ -212,7 +167,7 @@
 						if(json_decode(curl_exec($ch))->block == 1){
 							$clientInfo = self::$tsAdmin->getElement('data', self::$tsAdmin->clientInfo($key));
 							self::$tsAdmin->clientKick($key, 'server', self::$l->success_kick_anty_vpn);
-							$this->log('Wyrzucono (client_nickname: '.$clientInfo['client_nickname'].') za używanie VPN.');
+							$this->log(2, 'Wyrzucono (client_nickname: '.$clientInfo['client_nickname'].') za używanie VPN.');
 							unset($aktualnie_online[$key]);
 						}
 					}
@@ -227,12 +182,12 @@
 		 * @author	Majcon
 		 * @return	void
 		 **/
-		public function clean_channel(): void
+		public function cleanChannel(): void
 		{
 			$channellist = self::$tsAdmin->getElement('data', self::$tsAdmin->channelList("-topic -flags -voice -limits -icon"));
 			$i = 0;
 			foreach($channellist as $cl){
-				if($cl['pid'] == $this->config['functions_clean_channel']['pid']){
+				if($cl['pid'] == $this->config['functions_cleanChannel']['pid']){
 					$i++;
 					if($cl['channel_topic'] != 'WOLNY' && $cl['channel_topic'] != date('d.m.Y')){
 						if(!empty(self::$tsAdmin->getElement('data', self::$tsAdmin->channelClientList($cl['cid'])))){
@@ -261,7 +216,7 @@
 									self::$tsAdmin->setClientChannelGroup(8, $cl['cid'], $cgcl['cldbid']);
 								}
 							}
-							$this->log('Usunięcie kanału za brak aktywności (channel name: '.$cl['channel_name'].')');
+							$this->log(2, 'Usunięcie kanału za brak aktywności (channel name: '.$cl['channel_name'].')');
 						}
 					}
 				}
@@ -351,7 +306,7 @@
 									self::$tsAdmin->clientMove($ccl['clid'], $chl['cid']);
 									self::$tsAdmin->setClientChannelGroup(5, $chl['cid'], $ccl['client_database_id']);
 									self::$db->query("INSERT INTO `channel` VALUES (NULL, {$ccl['client_database_id']}, {$chl['cid']}, '{$ccl['connection_client_ip']}')");
-									$this->log('Założono kanał dla (nick name: '.$ccl['client_nickname'].')');
+									$this->log(2, 'Założono kanał dla (nick name: '.$ccl['client_nickname'].')');
 									$zalozony = 1;
 									break;
 								}
@@ -386,7 +341,7 @@
 							self::$tsAdmin->clientMove($ccl['clid'], $channelCreate['data']['cid']);
 							self::$tsAdmin->setClientChannelGroup(5, $channelCreate['data']['cid'], $ccl['client_database_id']);
 							self::$db->query("INSERT INTO `channel` VALUES (NULL, {$ccl['client_database_id']}, {$channelCreate['data']['cid']}, '{$ccl['connection_client_ip']}')");
-							$this->log('Założono kanał dla nick name: '.$ccl['client_nickname']);
+							$this->log(2, 'Założono kanał dla nick name: '.$ccl['client_nickname']);
 						}
 					}else{
 						self::$tsAdmin->clientMove($ccl['clid'], $this->config['functions_channelCreate']['cid_move']);
@@ -397,35 +352,95 @@
 		}
 
 		/**
-		 * ChannelNumber()
+		 * channelNumber()
 		 * Funkcja sprawdza i w razie, czego poprawia numer kanału.
 		 * @author	Majcon
 		 * @return	void
 		 **/
-		public function ChannelNumber(): void
+		public function channelNumber(): void
 		{
 			if(self::$ChannelNumberTime+10 < time()){
 				$i = 0;
 				$channellist = self::$tsAdmin->getElement('data', self::$tsAdmin->channelList('-topic'));
 				foreach($channellist as $chl){
-					if($chl['pid'] == $this->config['functions_ChannelNumber']['pid']){
+					if($chl['pid'] == $this->config['functions_channelNumber']['pid']){
 						$i++;
 						preg_match_all('/(\d+)(.*)/is', $chl['channel_name'], $matches);
 						if(!empty($matches[1][0])){
 							if($matches[1][0] != $i){
 								$matches[2][0] = $matches[2][0] ?? NULL;
-								if(!empty($matches[2][0]) && $matches[2][0]{0} == trim($this->config['functions_ChannelNumber']['separator'])){
+								if(!empty($matches[2][0]) && $matches[2][0]{0} == trim($this->config['functions_channelNumber']['separator'])){
 									$matches[2][0] = trim(substr(trim($matches[2][0]), 1));
 								}
-								self::$tsAdmin->channelEdit($chl['cid'], ['channel_name' => $i.$this->config['functions_ChannelNumber']['separator'].$matches[2][0]]);
+								self::$tsAdmin->channelEdit($chl['cid'], ['channel_name' => $i.$this->config['functions_channelNumber']['separator'].$matches[2][0]]);
 							}
 						}else{
-							self::$tsAdmin->channelEdit($chl['cid'], ['channel_name' => $i.$this->config['functions_ChannelNumber']['separator'].$chl['channel_name']]);
+							self::$tsAdmin->channelEdit($chl['cid'], ['channel_name' => $i.$this->config['functions_channelNumber']['separator'].$chl['channel_name']]);
 
 						}
 					}
 				}
 				self::$ChannelNumberTime = time()+10;
+			}
+		}
+
+		/**
+		 * groupOnline()
+		 * Funkcja wyświetla listę osób z podanej grupy w opisie na kanale o podanym ID.
+		 * @author	Majcon
+		 * @return	void
+		 **/
+		public function groupOnline(): void
+		{
+			foreach($this->config['functions_groupOnline']['cid'] as $cid => $value){
+				$i_online = 0;
+				$i_all = 0;
+				$groupOnline = NULL;
+				self::$older_groupOnline[$cid] = self::$older_groupOnline[$cid] ?? NULL;
+				self::$older_groupOnline_name[$cid] = self::$older_groupOnline_name[$cid] ?? NULL;
+				$channel_description = $value['title'];
+				foreach($value['gid'] as $gid => $name){
+					$serverGroupClientList = self::$tsAdmin->serverGroupClientList($gid, '-names');
+					$serverGroupClientListarray_filter = array_filter($serverGroupClientList['data'][0]);
+					if(!empty($serverGroupClientListarray_filter)){
+						$channel_description .= $name;
+						foreach($serverGroupClientList['data'] as $sgcl){
+							$i_all++;
+							foreach($this->clientlist as $cl){
+								if($sgcl['cldbid'] == $cl['client_database_id']){
+									$online = true;
+									$i_online++;
+									$channelinfo = self::$tsAdmin->getElement('data', self::$tsAdmin->channelInfo($cl['cid']));
+									$channel = self::$l->sprintf(self::$l->channel_groupOnline, $cl['cid'], $channelinfo['channel_name']);
+									$nick = self::$l->sprintf(self::$l->nick_groupOnline, $cl['client_database_id'], $cl['client_unique_identifier'], $cl['client_nickname']);
+									$channel_description .= self::$l->sprintf(self::$l->groupOnline_online, $nick, $channel);
+									$groupOnline .= $nick.$channel;
+									break;
+								}else{
+									$online = false;
+								}
+							}
+							if($online == false){
+								$clientdbinfo = self::$tsAdmin->getElement('data', self::$tsAdmin->clientDbInfo($sgcl['cldbid']));
+								$data = $this->przelicz_czas(time()-$clientdbinfo['client_lastconnected']);
+								$txt_time = $this->wyswietl_czas($data, 1, 1, 1, 0, 0);
+								$nick = self::$l->sprintf(self::$l->nick_groupOnline, $clientdbinfo['client_database_id'], $clientdbinfo['client_unique_identifier'], $clientdbinfo['client_nickname']);
+								$channel_description .= self::$l->sprintf(self::$l->groupOnline_offline, $nick, $txt_time);
+							}
+						}
+					}
+				}
+				if(self::$older_groupOnline[$cid] != $groupOnline || self::$groupOnline_time_edition+60 < time()){
+					$data['channel_description'] = $channel_description;
+					$groupOnline_name = self::$l->sprintf($value['channel_name'], $i_online, $i_all);
+					if($value['name_online'] == true && self::$older_groupOnline_name[$cid] != $groupOnline_name){
+						self::$older_groupOnline_name[$cid] = $groupOnline_name;
+						$data['channel_name'] = $groupOnline_name;
+					}
+					self::$tsAdmin->channelEdit($cid, $data);
+					self::$older_groupOnline[$cid] = $groupOnline;
+					self::$groupOnline_time_edition = time()+60;
+				}
 			}
 		}
 
@@ -436,15 +451,25 @@
 		 * @author	Majcon
 		 * @return	void
 		 **/
-		public function log($txt): void
+		public function log($error, $txt): void
 		{
 			if($this->config['functions_log']['on'] == true){
-				$txt = '['.date('H:i:s').'] '.$txt."\n";
-				$fp = @fopen('log/'.date('d.m.Y').'_log.log', "a"); 
-				flock($fp, 2); 
-				fwrite($fp, $txt); 
-				flock($fp, 3); 
-				fclose($fp);
+				if($error == 1 && $this->config['functions_log']['power'] > 1){
+					$txt = '['.date('H:i:s').'] '.$txt."\n";
+					$fp = @fopen('log/'.date('d.m.Y').'_error.log', "a"); 
+					flock($fp, 2); 
+					fwrite($fp, $txt); 
+					flock($fp, 3); 
+					fclose($fp);
+				}
+				if($error == 2 && $this->config['functions_log']['power'] > 0){
+					$txt = '['.date('H:i:s').'] '.$txt."\n";
+					$fp = @fopen('log/'.date('d.m.Y').'_log.log', "a"); 
+					flock($fp, 2); 
+					fwrite($fp, $txt); 
+					flock($fp, 3); 
+					fclose($fp);
+				}
 			}
 		}
 
@@ -594,11 +619,11 @@
 					if(!in_array($this->config['functions_register']['gidm'], $rangiexplode) && !in_array($this->config['functions_register']['gidk'], $rangiexplode)){
 						if($cl['cid'] == $this->config['functions_register']['cidm']){
 								self::$tsAdmin->serverGroupAddClient($this->config['functions_register']['gidm'], $cl['client_database_id']);
-								$this->log('Zarejestrowano nick name: '.$cl['client_nickname']);
+								$this->log(2, 'Zarejestrowano nick name: '.$cl['client_nickname']);
 						}
 						if($cl['cid'] == $this->config['functions_register']['cidk']){
 								self::$tsAdmin->serverGroupAddClient($this->config['functions_register']['gidk'], $cl['client_database_id']);
-								$this->log('Zarejestrowano nick name: '.$cl['client_nickname']);
+								$this->log(2, 'Zarejestrowano nick name: '.$cl['client_nickname']);
 						}
 					}
 				}
@@ -618,7 +643,7 @@
 			if($rekord < $count){
 				self::$tsAdmin->channelEdit($this->config['functions_rekord_online']['cid'], array('channel_name' => self::$l->sprintf(self::$l->success_rekord_online, $count, $this->padding_numbers($count, 'osoba', 'osoby', 'osób'))));
 				file_put_contents('includes/rekord.php', $count);
-				$this->log('Ustanowiono rekord osób online: '.$count);
+				$this->log(2, 'Ustanowiono rekord osób online: '.$count);
 			}
 		}
 
@@ -703,7 +728,7 @@
 							}
 						}
 						self::$db->query("DELETE FROM `channel` WHERE `cid` = {$cl['cid']}");
-						$this->log('Usunięcie kanału za wulgarną nazwę (channel name: '.$cl['channel_name'].')');
+						$this->log(2, 'Usunięcie kanału za wulgarną nazwę (channel name: '.$cl['channel_name'].')');
 					}
 				}
 			}
@@ -722,7 +747,7 @@
 					if($this->cenzor($cl['client_nickname'], 1) == true){
 						self::$tsAdmin->clientPoke($cl['clid'], self::$l->poke_sprnick);
 						self::$tsAdmin->clientKick($cl['clid'], "server", self::$l->kick_sprnick);
-						$this->log('Wyrzucono użytkownika za wulgarny nick (client unique identifier: '.$cl['client_unique_identifier'].')');
+						$this->log(2, 'Wyrzucono użytkownika ('.$cl['client_nickname'].') za wulgarny nick (client unique identifier: '.$cl['client_unique_identifier'].')');
 					}
 				}
 			}
@@ -764,6 +789,7 @@
 		{
 			if(self::$statusYt_time <= time()){
 				foreach($this->config['functions_statusYt']['cid_id'] as $cid => $id){
+					self::$statusYt_description[$cid] = self::$statusYt_description[$cid] ?? NULL;
 					$jdc = json_decode(file_get_contents("https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id={$id}&key={$this->config['functions_statusYt']['key']}"));
 					$channel_description = self::$l->sprintf(self::$l->channel_description_statusYt, $jdc->items[0]->id, $jdc->items[0]->snippet->title, $jdc->items[0]->statistics->subscriberCount, $jdc->items[0]->statistics->viewCount, $jdc->items[0]->snippet->description);
 					$channel_name = self::$l->sprintf(self::$l->channel_name_statusYt, $jdc->items[0]->snippet->title, $jdc->items[0]->statistics->subscriberCount);
