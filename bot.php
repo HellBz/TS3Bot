@@ -52,10 +52,6 @@
 				$funkcja->addRank();
 			}
 
-			if($config['functions_admins_ts_online']['on'] == true) {
-				$funkcja->admins_ts_online();
-			}
-
 			if($config['functions_aktualna_data']['on'] == true) {
 				$funkcja->aktualna_data();
 			}
@@ -68,15 +64,19 @@
 				$funkcja->anty_vpn();
 			}
 
-			if($config['functions_clean_channel']['on'] == true) {
-				$funkcja->clean_channel();
+			if($config['functions_cleanChannel']['on'] == true) {
+				$funkcja->cleanChannel();
 			}
 
 			if($config['functions_channelCreate']['on'] == true) {
 				$funkcja->channelCreate();
 			}
-			if($config['functions_ChannelNumber']['on'] == true) {
-				$funkcja->ChannelNumber();
+			if($config['functions_channelNumber']['on'] == true) {
+				$funkcja->channelNumber();
+			}
+
+			if($config['functions_groupOnline']['on'] == true) {
+				$funkcja->groupOnline();
 			}
 
 			if($config['functions_register']['on'] == true) {
@@ -133,7 +133,7 @@
 			sleep(1);
 		}while($whoami['virtualserver_status'] == 'online');
 	}else{
-		$funkcja->log('Connection could not be established.');
+		$funkcja->log(1, 'Connection could not be established.');
 	}
 	$tsAdmin->logout();
 ?>
