@@ -15,7 +15,7 @@
 
 		'bot' => [
 		
-			'ver'		=> '2.2.1'
+			'ver'		=> '2.3.4'
 		
 		],
 
@@ -28,21 +28,6 @@
 							1 => 2
 							
 							]													//ID kanału, na który trzeba wejść wraz z ID rangi, którą ma nadać po wejściu. Tutaj 1 oraz 3 to ID kanału 2 oraz 4 ID rangi.
-
-		],
-
-	//admins_ts_online() Funkcja wyświetla listę administracji na kanale o podanym ID.
-		'functions_admins_ts_online' => [
-
-			'on'	=> false,									//true - włączona false - wyłączona
-			'cid'	=> 1,										//ID kanału, na którym ma być zmieniany opis.
-			'gid'	=> [
-
-				2	=> '[B][COLOR=#A12364]Admin[/COLOR][/B]',
-				3	=> '[B][COLOR=#460070]Mod[/COLOR][/B]',
-				4	=> '[B][COLOR=#7C08E8]KidMod[/COLOR][/B]'
-
-			]													//ID Grupy wraz z nazwą rangi.
 
 		],
 
@@ -77,7 +62,7 @@
 		],
 
 	//clean_channel() Funkcja czyści kanały, które nie są aktywne dłużej niż 7 dni w podanym sektorze.
-		'functions_clean_channel' => [
+		'functions_cleanChannel' => [
 
 			'on'	=> false,									//true - włączona false - wyłączona
 			'pid'	=> 1										//Strefa, w której ma sprawdzać kanały, które są nieaktywne.
@@ -97,18 +82,45 @@
 		],
 		
 	//channelNumber() Funkcja sprawdza i w razie, czego poprawia numer kanału.
-		'functions_ChannelNumber' => [
+		'functions_channelNumber' => [
 
 			'on'		=> false,								//true - włączona false - wyłączona
 			'pid'		=> 1,									//Strefa, w której ma sprawdzać numery.
 			'separator'		=> '. '								//Separator oddzielający nazwę kanału od numeru.
 
 		],
-
+	//groupOnline() Funkcja wyświetla listę osób z podanej grupy w opisie na kanale o podanym ID.
+		'functions_groupOnline' => [
+			'on'		=> true,																						//true - włączona false - wyłączona
+			'cid'       => [
+				1 => [																									//ID Kanału.
+					'gid' => [	
+						2	=> '[CENTER][SIZE=16][COLOR=#A12364][B]CEO[/B][/COLOR][/SIZE][/CENTER]\n',
+						3	=> '[CENTER][SIZE=16][COLOR=#A12364][B]SA[/B][/COLOR][/SIZE][/CENTER]\n',
+						4	=> '[CENTER][SIZE=16][COLOR=#A12364][B]NA[/B][/COLOR][/SIZE][/CENTER]\n'
+					],																									//ID kanału, na którym ma być zmieniany opis oraz nazwa grupy.
+					'title' => '[CENTER][B][COLOR=#ff0000][SIZE=17]Administracja TS3[/SIZE][/COLOR][/B][/CENTER]\n\n',	//Tytuł w opisie.
+					'channel_name' => '[cspacer]▪ Administracja ({1} Online) ▪',										//Nazwa kanału {1} - oznacza liczbę online {2} - oznacza łączną liczbę osób.
+					'name_online' => true																				//Czy ma zmieniać nazwę kanału.
+				],
+				5 => [																									//ID Kanału.
+					'gid' => [	
+						6	=> '[CENTER][SIZE=16][COLOR=#E82A0B][B]ROOT[/B][/COLOR][/SIZE][/CENTER]\n',
+						7	=> '[CENTER][SIZE=16][COLOR=#E82A0B][B]Administrator[/B][/COLOR][/SIZE][/CENTER]\n',
+						8	=> '[CENTER][SIZE=16][COLOR=#C54201][B]Support[/B][/COLOR][/SIZE][/CENTER]\n',
+						9	=> '[CENTER][SIZE=16][COLOR=#239518][B]Moderator[/B][/COLOR][/SIZE][/CENTER]\n'
+					],																									//ID kanału, na którym ma być zmieniany opis oraz nazwa grupy.
+					'title' => '[CENTER][B][COLOR=#ff0000][SIZE=17]Administracja MC[/SIZE][/COLOR][/B][/CENTER]\n\n',	//Tytuł w opisie.
+					'channel_name' => '[cspacer]▪ Administracja MC ({1}/{2} Online) ▪',									//Nazwa kanału {1} - oznacza liczbę online {2} - oznacza łączną liczbę osób.
+					'name_online' => true																				//Czy ma zmieniać nazwę kanału.
+				]
+			]
+		],
 	//log() Funkcja zapisuje logi z bota do pliku.
 		'functions_log' => [
 
-			'on'	=> false										//true - włączona false - wyłączona
+			'on'	=> false,										//true - włączona false - wyłączona
+			'power'	=> 2											//Moc zapisu logu
 
 		],
 
@@ -202,7 +214,7 @@
 			],											//Dodatkowe słowa do cenzora słów.
 			'gid'	=> [
 
-				24, 146, 55
+				1, 2
 
 			]											//ID grup, które ma nie wyrzucać.
 
