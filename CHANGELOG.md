@@ -1,4 +1,7 @@
 # Changelog
+## [2.3.4] - 15.12.2017
+* Zmiana funkcji admins_ts_online() na groupOnline()
+* Poprawienie kilku drobnych błędów.
 
 ## [2.2.1] - 04.12.2017
 * Dodanie funkcji statusYt(), która ustawia w opisie kanału takie informacje jak liczba subskrypcji, liczba wyświetleń oraz zmienia nazwę kanału na nick z liczbą subskrypcji.
