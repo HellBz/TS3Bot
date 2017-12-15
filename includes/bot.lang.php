@@ -1,13 +1,4 @@
 <?php
-
-	//admins_ts_online(); 
-	$lang['heading_admins_ts_online'] = "[CENTER][B][COLOR=#ff0000][SIZE=17]Administracja TS3[/SIZE][/COLOR][/B][/CENTER]\n\n";
-	$lang['group_admins_ts_online'] = "[CENTER][B][SIZE=16]{1}[/SIZE][/B][/CENTER]\n\n[SIZE=10]";
-	$lang['channel_admins_ts_online'] = "[B][URL=channelID://{1}]{2}[/URL][/B]";
-	$lang['nick_admins_ts_online'] = "[B][URL=client://{1}/{2}]{3}[/URL][/B] ";
-	$lang['admins_ts_online'] = "{1} jest [COLOR=#00FF00][B]OnLine[/B][/COLOR] na kanale {2}\n";
-	$lang['admins_ts_offline'] = "{1} jest [COLOR=#FF0000]Offline[/COLOR] od {2}\n";
-	$lang['size_admins_ts_online'] = "[/SIZE]";
 	
 	//aktualna_data();
 	$lang['success_size_admins_ts_online'] = "[cspacer8]{1}";
@@ -20,7 +11,13 @@
 
 	//channelCreate();
 	$lang['error_has_a_channel_channelCreate'] = "Masz już kanał";
-	
+
+	//groupOnline(); 
+	$lang['channel_groupOnline'] = "[B][URL=channelID://{1}]{2}[/URL][/B]";
+	$lang['nick_groupOnline'] = "[B][URL=client://{1}/{2}]{3}[/URL][/B] ";
+	$lang['groupOnline_online'] = "[SIZE=10]{1} jest [COLOR=#00FF00][B]OnLine[/B][/COLOR] na kanale {2}[/SIZE]\n";
+	$lang['groupOnline_offline'] = "[SIZE=10]{1} jest [COLOR=#FF0000]Offline[/COLOR] od {2}[/SIZE]\n";
+
 	//poke();
 	$lang['error_admin_offline_poke'] = "Aktualnie nie ma administracji lub są zajęci";
 	$lang['nick_poke'] = "[B][URL=client://{1}/{2}]{3}[/URL][/B]";
