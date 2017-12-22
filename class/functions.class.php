@@ -953,9 +953,6 @@
 		{
 			$listOfUser = [];
 			foreach($this->clientlist as $cl) {
-				if($cl['client_type'] == 1 && $cl['client_nickname'] == 'Commend - Serwer: TS.PVP.IQ.PL'){
-					$clid = $cl['clid'];
-				}
 				if($cl['client_type'] == 0) {
 					$listOfUser[] = $cl['clid'];
 				}
@@ -964,26 +961,22 @@
 			$nowi = array_diff($listOfUser, self::$welcome_messege_list);
 			if(!empty($nowi)){
 				foreach($nowi as $n) {
-					if($this->config['functions_welcome_messege']['command_bot'] == true && !empty($clid)){
-						self::$tsAdmin->sendMessage(1, $clid, '!welcomemessege '.$n);
-					}else{
-						$wmtxt = $this->config['functions_welcome_messege']['txt'];
-						$clientInfo = self::$tsAdmin->getElement('data', self::$tsAdmin->clientInfo($n));
-						$grupy =  explode(',', $clientInfo['client_servergroups']);
-						if(in_array($this->config['functions_welcome_messege']['gid'], $grupy)){
-							$wmtxt = $this->config['functions_welcome_messege']['txt_new'];
-						}
-						$search = [
-							'%CLIENT_IP%', '%CLIENT_UNIQUE_ID%', '%CLIENT_DATABASE_ID%', '%CLIENT_ID%', '%CLIENT_CREATED%', '%CLIENT_COUNTRY%', '%CLIENT_VERSION%', '%CLIENT_PLATFORM%', '%CLIENT_NICKNAME%', '%CLIENT_TOTALCONNECTIONS%', '%CLIENT_LASTCONNECTED%', '%CLIENTONLINE%', '%MAXCLIENT%', '%HOUR%', '%DATE%'			
-						];
-		
-						$replace = [
-							$clientInfo['connection_client_ip'], $clientInfo['client_unique_identifier'], $clientInfo['client_database_id'], $n, date("H:i d.m.Y", $clientInfo['client_created']), $clientInfo['client_country'], $clientInfo['client_version'], $clientInfo['client_platform'], $clientInfo['client_nickname'], $clientInfo['client_totalconnections'], date("H:i d.m.Y",$clientInfo['client_lastconnected']), $this->serverinfo['virtualserver_clientsonline'] - $this->serverinfo['virtualserver_queryclientsonline'], $this->serverinfo['virtualserver_maxclients'], date('H:i'), date('d.m.Y')
-						];
-		
-						$wmtxt = str_replace($search, $replace, $wmtxt);
-						self::$tsAdmin->sendMessage(1, $n, $wmtxt);
+					$wmtxt = $this->config['functions_welcome_messege']['txt'];
+					$clientInfo = self::$tsAdmin->getElement('data', self::$tsAdmin->clientInfo($n));
+					$grupy =  explode(',', $clientInfo['client_servergroups']);
+					if(in_array($this->config['functions_welcome_messege']['gid'], $grupy)){
+						$wmtxt = $this->config['functions_welcome_messege']['txt_new'];
 					}
+					$search = [
+						'%CLIENT_IP%', '%CLIENT_UNIQUE_ID%', '%CLIENT_DATABASE_ID%', '%CLIENT_ID%', '%CLIENT_CREATED%', '%CLIENT_COUNTRY%', '%CLIENT_VERSION%', '%CLIENT_PLATFORM%', '%CLIENT_NICKNAME%', '%CLIENT_TOTALCONNECTIONS%', '%CLIENT_LASTCONNECTED%', '%CLIENTONLINE%', '%MAXCLIENT%', '%HOUR%', '%DATE%'			
+					];
+
+					$replace = [
+						$clientInfo['connection_client_ip'], $clientInfo['client_unique_identifier'], $clientInfo['client_database_id'], $n, date("H:i d.m.Y", $clientInfo['client_created']), $clientInfo['client_country'], $clientInfo['client_version'], $clientInfo['client_platform'], $clientInfo['client_nickname'], $clientInfo['client_totalconnections'], date("H:i d.m.Y",$clientInfo['client_lastconnected']), $this->serverinfo['virtualserver_clientsonline'] - $this->serverinfo['virtualserver_queryclientsonline'], $this->serverinfo['virtualserver_maxclients'], date('H:i'), date('d.m.Y')
+					];
+
+					$wmtxt = str_replace($search, $replace, $wmtxt);
+					self::$tsAdmin->sendMessage(1, $n, $wmtxt);
 				}
 				self::$welcome_messege_list = $listOfUser;
 			}
