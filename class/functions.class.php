@@ -22,7 +22,7 @@
 
 		private static $online_anty_vpn = [];
 
-		private static $ChannelNumberTime = 0;
+		private static $channelNumberTime = 0;
 
 		private static $czas_administracja_poke = [];
 
@@ -37,16 +37,16 @@
 		private static $statusYt_time = 0;
 
 		private static $statusYt_description = [];
-		
-		private static $online_top_connections = [];
 
-		private static $old_top  = NULL;
+		private static $top_activity_time = 0;
+
+		private static $description_top_connections  = NULL;
 		
 		private static $edit_top_connections = 0;
 
-		private static $update_connection_time = 0;
+		private static $description_top_longest_connection = 0;
 
-		private static $old_top_connection_time = NULL;
+		private static $edit_top_longest_connection = NULL;
 
 		private static $update_activity_time = 0;
 
@@ -359,7 +359,7 @@
 		 **/
 		public function channelNumber(): void
 		{
-			if(self::$ChannelNumberTime+10 < time()){
+			if(self::$channelNumberTime+10 < time()){
 				$i = 0;
 				$channellist = self::$tsAdmin->getElement('data', self::$tsAdmin->channelList('-topic'));
 				foreach($channellist as $chl){
@@ -380,7 +380,28 @@
 						}
 					}
 				}
-				self::$ChannelNumberTime = time()+10;
+				self::$channelNumberTime = time()+10;
+			}
+		}
+
+		/**
+		 * addRank()
+		 * Funkcja dodaje range po wejściu na kanało o podanym ID.
+		 * @author	Majcon
+		 * @return	void
+		 **/
+		public function delRank(): void
+		{
+			foreach($this->config['functions_delRank']['cid_gid'] as $klucz => $value) {
+				$channelClientList = self::$tsAdmin->getElement('data', self::$tsAdmin->channelClientList($klucz, '-groups'));
+				if(!empty($channelClientList)){
+					foreach($channelClientList as $ccl){
+						$explode = explode(',', $ccl['client_servergroups']);
+						if(in_array($value, $explode)){
+							self::$tsAdmin->serverGroupDeleteClient($value, $ccl['client_database_id']);
+						}
+					}
+				}
 			}
 		}
 
@@ -421,11 +442,20 @@
 								}
 							}
 							if($online == false){
+								$query = self::$db->query("SELECT COUNT(id) AS `count`, `last_activity` FROM `users` WHERE `cldbid` = {$sgcl['cldbid']} LIMIT 1");
+								while($row = $query->fetch()){
+									if($row['count'] != 0){
+										$last_activity = $row['last_activity'];
+									}else{
+										$last_activity = 0;
+									}
+								}
 								$clientdbinfo = self::$tsAdmin->getElement('data', self::$tsAdmin->clientDbInfo($sgcl['cldbid']));
-								$data = $this->przelicz_czas(time()-$clientdbinfo['client_lastconnected']);
+								$data = $this->przelicz_czas(time()-$last_activity);
 								$txt_time = $this->wyswietl_czas($data, 1, 1, 1, 0, 0);
 								$nick = self::$l->sprintf(self::$l->nick_groupOnline, $clientdbinfo['client_database_id'], $clientdbinfo['client_unique_identifier'], $clientdbinfo['client_nickname']);
 								$channel_description .= self::$l->sprintf(self::$l->groupOnline_offline, $nick, $txt_time);
+								$groupOnline .= $nick.$txt_time;
 							}
 						}
 					}
@@ -802,6 +832,32 @@
 				self::$statusYt_time = time()+60;
 			}
 		}
+		/**
+		 * top_connections()
+		 * Funkcja ustawia w opisie kanału o podanym ID TOP 10 aktywnych użytkowników.
+		 * @author	Majcon
+		 * @return	void
+		 **/
+		public function top_activity_time(): void
+		{
+			if(self::$top_activity_time <= time()){
+				$s = 0;
+				$top = NULL;
+				if(!empty($this->config['functions_top_activity_time']['cldbid'])){
+					$cldbid = implode(",", $this->config['functions_top_activity_time']['cldbid']);
+				}
+				$query = self::$db->query("SELECT `client_nickname`, `cui`, `cldbid`, `time_activity` FROM `users` WHERE `cldbid` NOT IN({$cldbid}) ORDER BY `time_activity` DESC LIMIT {$this->config['functions_top_activity_time']['limit']}");
+				while($row = $query->fetch()){
+					$s++;
+					$data = $this->przelicz_czas($row['time_activity'], 1);
+					$data = $this->wyswietl_czas($data, 1, 1, 1, 0, 0);
+					$nick = "[B][URL=client://{$row['cldbid']}/{$row['cui']}]{$row['client_nickname']}[/URL][/B]";
+					$top .= "[SIZE=10][COLOR=#ff0000][B]{$s}.)[/B][/COLOR] {$nick} {$data}\n[/SIZE]";
+				}
+				self::$tsAdmin->channelEdit($this->config['functions_top_activity_time']['cid'], array('channel_description' => $top));
+				self::$top_activity_time = time()+60;
+			}
+		}
 
 		/**
 		 * top_connections()
@@ -811,39 +867,20 @@
 		 **/
 		public function top_connections(): void
 		{
-			$aktualnie_online = [];
-			foreach($this->clientlist as $cl) {
-				if($cl['client_type'] == 0) {
-					$aktualnie_online[] = $cl['client_database_id'];
-				}
-			}
-			$array_diff = array_diff($aktualnie_online, self::$online_top_connections);
-			if(!empty($array_diff)){
-				foreach($array_diff as $ad) {
-					$clientdbinfo = self::$tsAdmin->getElement('data', self::$tsAdmin->clientDbInfo($ad));
-					$query = self::$db->query("SELECT COUNT(id) AS `count` FROM `top_connections` WHERE `cldbid` = {$ad} LIMIT 1");
-					while($row = $query->fetch()){
-						$count = $row['count'];
-					}
-					if($count == 0){
-						self::$db->query("INSERT INTO `top_connections` VALUES (NULL, {$clientdbinfo['client_database_id']}, '{$clientdbinfo['client_nickname']}', '{$clientdbinfo['client_unique_identifier']}', {$clientdbinfo['client_totalconnections']})");
-					}else{
-						self::$db->query("UPDATE `top_connections` SET `connections` = {$clientdbinfo['client_totalconnections']}, `client_nickname` = '{$clientdbinfo['client_nickname']}' WHERE `cldbid` = {$clientdbinfo['client_database_id']}");
-					}
-				}
-			}
-			self::$online_top_connections = $aktualnie_online;
 			$s = 0;
 			$top = NULL;
-			$pobierz_top = self::$db->query("SELECT * FROM `top_connections` ORDER BY `connections` DESC LIMIT {$this->config['functions_top_connections_time']['limit']}");
-			while($pt = $pobierz_top->fetch()){
-				$s++;
-				$nick = "[B][URL=client://{$pt['cldbid']}/{$pt['cui']}]{$pt['client_nickname']}[/URL][/B]";
-				$top .= "[SIZE=10][COLOR=#ff0000][B]{$s}.)[/B][/COLOR] {$nick} {$pt['connections']}\n[/SIZE]";
+			if(!empty($this->config['functions_top_connections']['cldbid'])){
+				$cldbid = implode(",", $this->config['functions_top_activity_time']['cldbid']);
 			}
-			if($top != self::$old_top){
+			$query = self::$db->query("SELECT `client_nickname`, `cui`, `cldbid`, `connections` FROM `users` WHERE `cldbid` NOT IN({$cldbid}) ORDER BY `connections` DESC LIMIT {$this->config['functions_top_activity_time']['limit']}");
+			while($row = $query->fetch()){
+				$s++;
+				$nick = "[B][URL=client://{$row['cldbid']}/{$row['cui']}]{$row['client_nickname']}[/URL][/B]";
+				$top .= "[SIZE=10][COLOR=#ff0000][B]{$s}.)[/B][/COLOR] {$nick} {$row['connections']}\n[/SIZE]";
+			}
+			if($top != self::$description_top_connections){
 				self::$tsAdmin->channelEdit($this->config['functions_top_connections']['cid'], array('channel_description' => $top));
-				self::$old_top = $top;
+				self::$description_top_connections = $top;
 			}
 		}
 
@@ -853,51 +890,33 @@
 		 * @author	Majcon
 		 * @return	void
 		 **/
-		public function top_connection_time(): void
+		public function top_longest_connection(): void
 		{
-			if(self::$update_connection_time <= time()){
-				foreach($this->clientlist as $cl){
-					$clientInfo = self::$tsAdmin->getElement('data', self::$tsAdmin->clientInfo($cl['clid']));
-					$query = self::$db->query("SELECT COUNT(id) AS `count`, `connected_time` FROM `top_connection_time` WHERE `cldbid` = {$cl['client_database_id']} LIMIT 1");
-					while($row = $query->fetch()){
-						$count = $row['count'];
-						$connected_time = $row['connected_time'];
-					}
-					if($count == 0){
-						self::$db->query("INSERT INTO `top_connection_time` VALUES (NULL, {$cl['client_database_id']}, '{$cl['client_nickname']}', '{$cl['client_unique_identifier']}', {$clientInfo['connection_connected_time']})");
-					}else{
-						if($connected_time < $clientInfo['connection_connected_time']){
-							self::$db->query("UPDATE `top_connection_time` SET `connected_time` = {$clientInfo['connection_connected_time']}, `client_nickname` = '{$cl['client_nickname']}' WHERE `cldbid` = {$cl['client_database_id']}");
-						}
-					}
-				}
-				self::$update_connection_time = time()+60;
-			}
-			if(self::$edit_top_connections <= time()){
+			if(self::$edit_top_longest_connection <= time()){
 				$s = 0;
 				$top = NULL;
-				if(!empty($this->config['functions_top_connections_time']['cldbid'])){
-					$cldbid = implode(",", $this->config['functions_top_connections_time']['cldbid']);
+				if(!empty($this->config['functions_top_longest_connection']['cldbid'])){
+					$cldbid = implode(",", $this->config['functions_top_longest_connection']['cldbid']);
 				}
-				$pobierz_top = self::$db->query("SELECT * FROM `top_connection_time` WHERE `cldbid` NOT IN({$cldbid}) ORDER BY `connected_time` DESC LIMIT {$this->config['functions_top_connections_time']['limit']}");
-				while($pt = $pobierz_top->fetch()){
+				$query = self::$db->query("SELECT `client_nickname`, `cui`, `cldbid`, `longest_connection` FROM `users` WHERE `cldbid` NOT IN({$cldbid}) ORDER BY `longest_connection` DESC LIMIT {$this->config['functions_top_activity_time']['limit']}");
+				while($row = $query->fetch()){
 					$s++;
-					$data = $this->przelicz_czas($pt['connected_time']/1000);
+					$data = $this->przelicz_czas($row['longest_connection']/1000);
 					$data = $this->wyswietl_czas($data, 1, 1, 1, 0, 0);
-					$nick = "[B][URL=client://{$pt['cldbid']}/{$pt['cui']}]{$pt['client_nickname']}[/URL][/B]";
+					$nick = "[B][URL=client://{$row['cldbid']}/{$row['cui']}]{$row['client_nickname']}[/URL][/B]";
 					$top .= "[SIZE=10][COLOR=#ff0000][B]{$s}.)[/B][/COLOR] {$nick} {$data}\n[/SIZE]";
 				}
-				if($top != self::$old_top_connection_time){
-					self::$tsAdmin->channelEdit($this->config['functions_top_connections_time']['cid'], array('channel_description' => $top));
-					self::$old_top_connection_time = $top;
+				if($top != self::$description_top_longest_connection){
+					self::$tsAdmin->channelEdit($this->config['functions_top_longest_connection']['cid'], array('channel_description' => $top));
+					self::$description_top_longest_connection = $top;
 				}
-				self::$edit_top_connections = time()+300;
+				self::$edit_top_longest_connection = time()+300;
 			}
 		}
 
 		/**
 		 * update_activity()
-		 * Funkcja ustawia w opisie kanału o podanym ID TOP 10 aktywnych użytkowników.
+		 * Funkcja aktualizuje aktywność użytkowników.
 		 * @author	Majcon
 		 * @return	void
 		 **/
@@ -905,32 +924,21 @@
 		{
 			if(self::$update_activity_time <= time()){
 				foreach($this->clientlist as $cl){
-					$pobierz_czas_przebywania = self::$db->query("SELECT COUNT(id) AS `count` FROM `czas_przebywania` WHERE `cldbid` = {$cl['client_database_id']} LIMIT 1");
-					while($pcp = $pobierz_czas_przebywania->fetch()){
-						$count = $pcp['count'];
+					$clientInfo = self::$tsAdmin->getElement('data', self::$tsAdmin->clientInfo($cl['clid']));
+					$query = self::$db->query("SELECT COUNT(id) AS `count` FROM `users` WHERE `cldbid` = {$cl['client_database_id']} LIMIT 1");
+					while($row = $query->fetch()){
+						$count = $row['count'];
 					}
 					if($count == 0){
-					self::$db->query("INSERT INTO `czas_przebywania` VALUES (NULL, {$cl['client_database_id']}, {$cl['clid']}, '{$cl['client_nickname']}', '{$cl['client_unique_identifier']}', 0)");
+						self::$db->query("INSERT INTO `users` VALUES (NULL, {$cl['client_database_id']}, '{$cl['client_nickname']}', '{$cl['client_unique_identifier']}', 0, 0, 0, ".time().")");
 					}else{
 						if($cl['client_idle_time'] < 300000){
-							self::$db->query("UPDATE `czas_przebywania` SET `time` = time+60, `client_nickname` = '{$cl['client_nickname']}', `clid` = {$cl['clid']} WHERE `cldbid` = {$cl['client_database_id']}");
+							self::$db->query("UPDATE `users` SET `connections` = {$clientInfo['client_totalconnections']}, `longest_connection` = {$clientInfo['connection_connected_time']}, `time_activity` = time_activity+60, `last_activity` = ".time().", `client_nickname` = '{$cl['client_nickname']}'  WHERE `cldbid` = {$cl['client_database_id']}");
+						}else{
+							self::$db->query("UPDATE `users` SET `connections` = {$clientInfo['client_totalconnections']}, `longest_connection` = {$clientInfo['connection_connected_time']}, `last_activity` = ".time().", `client_nickname` = '{$cl['client_nickname']}'  WHERE `cldbid` = {$cl['client_database_id']}");
 						}
 					}
 				}
-				$s = 0;
-				$top = NULL;
-				if(!empty($this->config['functions_update_activity']['cldbid'])){
-					$cldbid = implode(",", $this->config['functions_update_activity']['cldbid']);
-				}
-				$pobierz_top = self::$db->query("SELECT * FROM `czas_przebywania` WHERE `cldbid` NOT IN({$cldbid}) ORDER BY `time` DESC LIMIT {$this->config['functions_top_connections_time']['limit']}");
-				while($pt = $pobierz_top->fetch()){
-					$s++;
-					$data = $this->przelicz_czas($pt['time'], 1);
-					$data = $this->wyswietl_czas($data, 1, 1, 1, 0, 0);
-					$nick = "[B][URL=client://{$pt['cldbid']}/{$pt['cui']}]{$pt['client_nickname']}[/URL][/B]";
-					$top .= "[SIZE=10][COLOR=#ff0000][B]{$s}.)[/B][/COLOR] {$nick} {$data}\n[/SIZE]";
-				}
-				self::$tsAdmin->channelEdit($this->config['functions_update_activity']['cid'], array('channel_description' => $top));
 				self::$update_activity_time = time()+60;
 			}
 		}
@@ -945,29 +953,37 @@
 		{
 			$listOfUser = [];
 			foreach($this->clientlist as $cl) {
+				if($cl['client_type'] == 1 && $cl['client_nickname'] == 'Commend - Serwer: TS.PVP.IQ.PL'){
+					$clid = $cl['clid'];
+				}
 				if($cl['client_type'] == 0) {
 					$listOfUser[] = $cl['clid'];
 				}
 			}
+			$this->config['functions_welcome_messege']['command_bot'] = true;
 			$nowi = array_diff($listOfUser, self::$welcome_messege_list);
-			if($nowi){
+			if(!empty($nowi)){
 				foreach($nowi as $n) {
-					$wmtxt = $this->config['functions_welcome_messege']['txt'];
-					$clientInfo = self::$tsAdmin->getElement('data', self::$tsAdmin->clientInfo($n));
-					$grupy =  explode(',', $clientInfo['client_servergroups']);
-					if(in_array($this->config['functions_welcome_messege']['gid'], $grupy)){
-						$wmtxt = $this->config['functions_welcome_messege']['txt_new'];
+					if($this->config['functions_welcome_messege']['command_bot'] == true && !empty($clid)){
+						self::$tsAdmin->sendMessage(1, $clid, '!welcomemessege '.$n);
+					}else{
+						$wmtxt = $this->config['functions_welcome_messege']['txt'];
+						$clientInfo = self::$tsAdmin->getElement('data', self::$tsAdmin->clientInfo($n));
+						$grupy =  explode(',', $clientInfo['client_servergroups']);
+						if(in_array($this->config['functions_welcome_messege']['gid'], $grupy)){
+							$wmtxt = $this->config['functions_welcome_messege']['txt_new'];
+						}
+						$search = [
+							'%CLIENT_IP%', '%CLIENT_UNIQUE_ID%', '%CLIENT_DATABASE_ID%', '%CLIENT_ID%', '%CLIENT_CREATED%', '%CLIENT_COUNTRY%', '%CLIENT_VERSION%', '%CLIENT_PLATFORM%', '%CLIENT_NICKNAME%', '%CLIENT_TOTALCONNECTIONS%', '%CLIENT_LASTCONNECTED%', '%CLIENTONLINE%', '%MAXCLIENT%', '%HOUR%', '%DATE%'			
+						];
+		
+						$replace = [
+							$clientInfo['connection_client_ip'], $clientInfo['client_unique_identifier'], $clientInfo['client_database_id'], $n, date("H:i d.m.Y", $clientInfo['client_created']), $clientInfo['client_country'], $clientInfo['client_version'], $clientInfo['client_platform'], $clientInfo['client_nickname'], $clientInfo['client_totalconnections'], date("H:i d.m.Y",$clientInfo['client_lastconnected']), $this->serverinfo['virtualserver_clientsonline'] - $this->serverinfo['virtualserver_queryclientsonline'], $this->serverinfo['virtualserver_maxclients'], date('H:i'), date('d.m.Y')
+						];
+		
+						$wmtxt = str_replace($search, $replace, $wmtxt);
+						self::$tsAdmin->sendMessage(1, $n, $wmtxt);
 					}
-					$search = [
-						'%CLIENT_IP%', '%CLIENT_UNIQUE_ID%', '%CLIENT_DATABASE_ID%', '%CLIENT_ID%', '%CLIENT_CREATED%', '%CLIENT_COUNTRY%', '%CLIENT_VERSION%', '%CLIENT_PLATFORM%', '%CLIENT_NICKNAME%', '%CLIENT_TOTALCONNECTIONS%', '%CLIENT_LASTCONNECTED%', '%CLIENTONLINE%', '%MAXCLIENT%', '%HOUR%', '%DATE%'			
-					];
-	
-					$replace = [
-						$clientInfo['connection_client_ip'], $clientInfo['client_unique_identifier'], $clientInfo['client_database_id'], $n, date("H:i d.m.Y", $clientInfo['client_created']), $clientInfo['client_country'], $clientInfo['client_version'], $clientInfo['client_platform'], $clientInfo['client_nickname'], $clientInfo['client_totalconnections'], date("H:i d.m.Y",$clientInfo['client_lastconnected']), $this->serverinfo['virtualserver_clientsonline'] - $this->serverinfo['virtualserver_queryclientsonline'], $this->serverinfo['virtualserver_maxclients'], date('H:i'), date('d.m.Y')
-					];
-	
-					$wmtxt = str_replace($search, $replace, $wmtxt);
-					self::$tsAdmin->sendMessage(1, $n, $wmtxt);
 				}
 				self::$welcome_messege_list = $listOfUser;
 			}
@@ -987,7 +1003,7 @@
 		private function wyswietl_czas($data, $d=0, $h=0, $i=0, $s=0, $t=0): string
 		{
 			$txt_time = null;
-			if($d==1){
+			if($d == 1){
 				if($data['d'] == 0){
 					$txt_time .= '';
 				}else{
@@ -997,7 +1013,7 @@
 			}else{
 				$data['d'] = 0;
 			}
-			if($h==1){
+			if($h == 1){
 				if($data['d'] == 0 && $data['H'] == 0){
 					$txt_time .= '';
 				}else{
@@ -1008,7 +1024,7 @@
 			else{
 				$data['H'] = 0;
 			}
-			if($i==1){
+			if($i == 1){
 				if($data['d'] == 0 && $data['H'] == 0 && $data['i'] == 0){
 					$txt_time .= '';
 				}else{
@@ -1018,16 +1034,19 @@
 			}else{
 				$data['i'] = 0;
 			}
-			if($s==1){
+			if($s == 1){
 				if($data['d'] == 0 && $data['s'] == 0 && $data['i'] == 0 && $data['H'] == 0){
-					if($t == 0){
-						$txt_time = '0 '.self::$l->time_s2_wyswietl_czas;
-					}else{
-						$txt_time = 'TERAZ';
-					}
+					$txt_time .= '';
 				}else{
 					$l->time_s1_wyswietl_czas = $this->padding_numbers($data['s'], self::$l->time_s1_wyswietl_czas, self::$l->time_s2_wyswietl_czas, self::$l->time_s3_wyswietl_czas);
 					$txt_time .= $data['s'].' '.self::$l->time_s1_wyswietl_czas;
+				}
+			}
+			if(empty($txt_time)){
+				if($t == 0){
+					$txt_time = '0 '.self::$l->time_s3_wyswietl_czas;
+				}else{
+					$txt_time = 'TERAZ';
 				}
 			}
 			return $txt_time;
