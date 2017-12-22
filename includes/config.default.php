@@ -26,7 +26,7 @@
 			'cid_gid'	=> [
 
 							1 => 2,
-							3 =? 4
+							3 => 4
 
 							]												//ID kanału, na który trzeba wejść wraz z ID rangi, którą ma nadać po wejściu. Tutaj 1 oraz 3 to ID kanału 2 oraz 4 ID rangi.
 
