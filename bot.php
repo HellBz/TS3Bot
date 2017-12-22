@@ -6,7 +6,7 @@
 	 * @author		Majcon
 	 * @email		Majcon94@gmail.com
 	 * @copyright	© 2016-2017 Majcon
-	 * @version		2.0
+	 * @version		2.5
 	 **/
 	if(!file_exists("includes/config.php") == true) {
 		die("Plik config.php nie istnieje!");
@@ -47,7 +47,8 @@
 			$whoami = $tsAdmin->getElement('data', $tsAdmin->whoAmI());
 			$funkcja->setClientlist($tsAdmin->getElement('data', $tsAdmin->clientList("-groups -uid -times -ip")));
 			$funkcja->setServerinfo($tsAdmin->getElement('data', $tsAdmin->serverInfo()));
-			
+			$funkcja->update_activity();
+
 			if($config['functions_addRank']['on'] == true) {
 				$funkcja->addRank();
 			}
@@ -73,6 +74,10 @@
 			}
 			if($config['functions_channelNumber']['on'] == true) {
 				$funkcja->channelNumber();
+			}
+
+			if($config['functions_delRank']['on'] == true) {
+				$funkcja->delRank();
 			}
 
 			if($config['functions_groupOnline']['on'] == true) {
@@ -115,16 +120,16 @@
 				$funkcja->poke();
 			}
 
+			if($config['functions_top_activity_time']['on'] == true) {
+				$funkcja->top_activity_time();
+			}
+
 			if($config['functions_top_connections']['on'] == true) {
 				$funkcja->top_connections();
 			}
 
-			if($config['functions_top_connections_time']['on'] == true) {
-				$funkcja->top_connection_time();
-			}
-
-			if($config['functions_update_activity']['on'] == true) {
-				$funkcja->update_activity();
+			if($config['functions_top_longest_connection']['on'] == true) {
+				$funkcja->top_longest_connection();
 			}
 
 			if($config['functions_welcome_messege']['on'] == true) {
