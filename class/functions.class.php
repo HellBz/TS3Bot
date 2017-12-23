@@ -44,9 +44,9 @@
 		
 		private static $edit_top_connections = 0;
 
-		private static $description_top_longest_connection = 0;
+		private static $description_top_longest_connection = NULL;
 
-		private static $edit_top_longest_connection = NULL;
+		private static $edit_top_longest_connection = 0;
 
 		private static $update_activity_time = 0;
 
