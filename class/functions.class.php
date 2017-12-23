@@ -422,7 +422,7 @@
 				$channel_description = $value['title'];
 				foreach($value['gid'] as $gid => $name){
 					$serverGroupClientList = self::$tsAdmin->serverGroupClientList($gid, '-names');
-					$serverGroupClientListarray_filter = array_filter($serverGroupClientList['data'][0]);
+					$serverGroupClientListarray_filter = array_filter($serverGroupClientList['data'][0] ?? []);
 					if(!empty($serverGroupClientListarray_filter)){
 						$channel_description .= $name;
 						foreach($serverGroupClientList['data'] as $sgcl){
