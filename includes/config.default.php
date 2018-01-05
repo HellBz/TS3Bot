@@ -58,7 +58,7 @@
 				'G1MUSIS0ZxsuI1E9y3u/+CkIfow=', 'TMJaj/eXYJsgRBpKooprVxopUg8='
 
 			],																	//Unique identifier użytkownika, którego ma nie wyrzucać za VPN.
-			'key'		=> 'NDIyOmF5QXFTMTlMcmtoWExpOTJIdzFBNDBrQ1dMaGI1OU9R'	//Klucz do API można go uzyskać na stronie https://iphub.info/pricing
+			'key'		=> 'NTU4OnEzSmJZaENmWU1LcHJBYWw1VFN4enpVSGcwdkRFeHFs'	//Klucz do API można go uzyskać na stronie https://iphub.info/pricing
 
 		],
 
