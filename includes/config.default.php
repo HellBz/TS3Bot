@@ -78,7 +78,7 @@
 			'pid'		=> 2,												//Strefa, w której ma zakładać kanały prywatne.
 			'ile'		=> 3,												//Liczba podkanałów.
 			'channel_description'	=> '[hr]\n\nWłaściciel: %CLIENT_NICKNAME%\n\nData utworzenia: %DATE%\n\n[hr]', //Opis kanału %CLIENT_NICKNAME% - Nick właściciela kanału %DATE% - Data założenia %HOUR% - Godzina założenia
-						'setting'	=> [
+			'setting'	=> [
 
 								'channel_flag_maxfamilyclients_unlimited' 	=> 1,
 								'channel_flag_maxclients_unlimited' 		=> 1,
