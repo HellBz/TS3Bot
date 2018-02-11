@@ -78,6 +78,35 @@
 			'pid'		=> 2,												//Strefa, w której ma zakładać kanały prywatne.
 			'ile'		=> 3,												//Liczba podkanałów.
 			'channel_description'	=> '[hr]\n\nWłaściciel: %CLIENT_NICKNAME%\n\nData utworzenia: %DATE%\n\n[hr]', //Opis kanału %CLIENT_NICKNAME% - Nick właściciela kanału %DATE% - Data założenia %HOUR% - Godzina założenia
+						'setting'	=> [
+
+								'channel_flag_maxfamilyclients_unlimited' 	=> 1,
+								'channel_flag_maxclients_unlimited' 		=> 1,
+								'channel_maxclients'						=> '-1',
+								'channel_maxfamilyclients' 					=> '-1',
+								'channel_password' 							=> '',
+								'channel_codec'								=> 2,
+								'channel_codec_quality'						=> 7,
+								'channel_flag_semi_permanent'				=> 0,
+								'channel_needed_talk_power'					=> 0,
+								'channel_icon_id'							=> 0,
+
+			],																//Dodatkowe ustawienia kanału głównego.
+			'setting_subchannel'	=> [
+
+								'channel_flag_permanent' 					=> 1,
+								'channel_flag_maxclients_unlimited' 		=> 1,
+								'channel_flag_maxfamilyclients_unlimited' 	=> 1,
+								'channel_maxclients' 						=> '-1',
+								'channel_maxfamilyclients'					=> '-1',
+								'channel_topic' 							=> '',
+								'channel_codec'								=> 2,
+								'channel_codec_quality'						=> 7,
+								'channel_flag_semi_permanent'				=> 0,
+								'channel_needed_talk_power'					=> 0,
+								'channel_icon_id'							=> 0,
+
+			],																//Dodatkowe ustawienia podkanałów.
 			'cid_move'	=> 4												//ID kanału, na który ma przenieść jeżeli użytkownik posiada już swój kanał.
 
 		],
