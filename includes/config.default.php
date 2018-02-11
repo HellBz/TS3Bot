@@ -142,7 +142,7 @@
 						2	=> '[CENTER][SIZE=16][COLOR=#A12364][B]Admin[/B][/COLOR][/SIZE][/CENTER]\n',
 						3	=> '[CENTER][SIZE=16][COLOR=#A12364][B]Mod[/B][/COLOR][/SIZE][/CENTER]\n',
 						4	=> '[CENTER][SIZE=16][COLOR=#A12364][B]KidMod[/B][/COLOR][/SIZE][/CENTER]\n'
-					],																									//ID kanału, na którym ma być zmieniany opis oraz nazwa grupy.
+					],																									//ID grupy oraz nazwa grupy.
 					'title' => '[CENTER][B][COLOR=#ff0000][SIZE=17]Administracja TS3[/SIZE][/COLOR][/B][/CENTER]\n\n',
 					'channel_name' => '[cspacer]▪ Administracja ({1} Online) ▪',										//Nazwa kanału {1} - oznacza liczbę online {2} - oznacza łączną liczbę osób.
 					'name_online' => true																				//Czy ma zmieniać nazwę kanału.
@@ -151,7 +151,7 @@
 					'gid' => [	
 						6	=> '[CENTER][SIZE=16][COLOR=#E82A0B][B]Admin[/B][/COLOR][/SIZE][/CENTER]\n',
 						7	=> '[CENTER][SIZE=16][COLOR=#E82A0B][B]Mod[/B][/COLOR][/SIZE][/CENTER]\n'
-					],																									//ID kanału, na którym ma być zmieniany opis oraz nazwa grupy.
+					],																									//ID grupy oraz nazwa grupy.
 					'title' => '[CENTER][B][COLOR=#ff0000][SIZE=17]Administracja Forum[/SIZE][/COLOR][/B][/CENTER]\n\n',	//Tytuł w opisie.
 					'channel_name' => '[cspacer]▪ Administracja Forum ({1}/{2} Online) ▪',										//Nazwa kanału {1} - oznacza liczbę online {2} - oznacza łączną liczbę osób.
 					'name_online' => true																				//Czy ma zmieniać nazwę kanału.
