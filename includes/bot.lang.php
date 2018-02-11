@@ -12,25 +12,21 @@
 	//channelCreate();
 	$lang['error_has_a_channel_channelCreate'] = "Masz już kanał";
 
+	//channelDelete();
+	$lang['kick_channelDelete'] = "Usunięcie kanału";
+
 	//groupOnline(); 
-	$lang['channel_groupOnline'] = "[B][URL=channelID://{1}]{2}[/URL][/B]";
-	$lang['nick_groupOnline'] = "[B][URL=client://{1}/{2}]{3}[/URL][/B] ";
 	$lang['groupOnline_online'] = "[SIZE=10]{1} jest [COLOR=#00FF00][B]OnLine[/B][/COLOR] na kanale {2}[/SIZE]\n";
 	$lang['groupOnline_offline'] = "[SIZE=10]{1} jest [COLOR=#FF0000]Offline[/COLOR] od {2}[/SIZE]\n";
 
 	//poke();
 	$lang['error_admin_offline_poke'] = "Aktualnie nie ma administracji lub są zajęci";
-	$lang['nick_poke'] = "[B][URL=client://{1}/{2}]{3}[/URL][/B]";
 	$lang['success_admin_poke'] = "{1} potrzebuje Twojej pomocy";
 	$lang['success_he_was_informed_poke'] = "Administracja została powiadomiona. Czekaj cierpliwie";
 	$lang['error_admin_before_poke'] = "Administracja została już wcześniej powiadomiona.Czekaj cierpliwie";
-	$lang['admin_hellp_again_poke'] = "Rusz tą dupę i idź mu pomóc ;/";
 	
 	//rekord_online();
 	$lang['success_rekord_online'] = "[cspacer8]Rekord osób online: {1} {2}";
-	
-	//sprchannel();
-	$lang['kick_sprchannel'] = "Usunięcie kanału";
 
 	//sprnick();
 	$lang['poke_sprnick'] = "Prosimy o zmianę nicku. Dziękujemy.";
