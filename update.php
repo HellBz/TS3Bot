@@ -1,4 +1,5 @@
 <?php
+	set_time_limit(0);
 	$db = new PDO('sqlite:ts3bot.sqlitedb');
 	$query = $db->query("SELECT COUNT(*) as `count` FROM `sqlite_sequence` WHERE `name` = 'ip'");
 	while($row = $query->fetch()){
