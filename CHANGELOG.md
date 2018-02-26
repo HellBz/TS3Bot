@@ -13,7 +13,8 @@
 * Dodano TOP 10 najdłuższe połączenie oraz TOP 10 najwięcej połączeń.
 * Zmiana API do AntyVPN.
 * Kilka drobnych poprawek.
-Aktualizacja wymaga ponownego konfigurowania bota lub dodanie brakujących opcji w konofitu oraz wykonania pliku update.php.
+
+Aktualizacja wymaga ponownego konfigurowania bota lub dodanie brakujących opcji w konfigu oraz wykonania pliku update.php.
 Wystarczy wpisać php update.php.
 
 ## [2.0.6] - 25.06.2017
