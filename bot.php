@@ -6,7 +6,7 @@
 	 * @author		Majcon
 	 * @email		Majcon94@gmail.com
 	 * @copyright	© 2016-2017 Majcon
-	 * @version		2.5
+	 * @version		2.0
 	 **/
 	if(!file_exists("includes/config.php") == true) {
 		die("Plik config.php nie istnieje!");
@@ -22,9 +22,11 @@
 	if(!file_exists("class/functions.class.php") == true) {
 		die("Plik functions.class.php nie istnieje!");
 	}else{
-		require_once 'class/functions.class.php';
-		$funkcja = new Funkcje();
+		require_once 'class/functions.class.php';;
 	}
+		require_once 'class/commands.class.php';
+		$command = new Commands();
+
 	if(!file_exists("class/ts3admin.class.php") == true) {
 		die("Plik ts3admin.class.php nie istnieje!");
 	}else{
@@ -39,106 +41,115 @@
 		$tsAdmin->login($config['server']['login'], $config['server']['password']);
 		$tsAdmin->selectServer($config['server']['port']);
 		$tsAdmin->setName($config['server']['nick']);
-		$funkcja->setConfig($config);
-		$funkcja->setDb($db);
-		$funkcja->setLang($l);
-		$funkcja->setTs3admin($tsAdmin);
+		$command->setConfig($config);
+		$command->setDb($db);
+		$command->setLang($l);
+		$command->setTs3admin($tsAdmin);
 		do{
 			$whoami = $tsAdmin->getElement('data', $tsAdmin->whoAmI());
-			$funkcja->setClientlist($tsAdmin->getElement('data', $tsAdmin->clientList("-groups -uid -times -ip")));
-			$funkcja->setServerinfo($tsAdmin->getElement('data', $tsAdmin->serverInfo()));
-			$funkcja->update_activity();
+			$command->setClientlist($tsAdmin->getElement('data', $tsAdmin->clientList("-groups -uid -times -ip -voice -away")));
+			$command->setServerinfo($tsAdmin->getElement('data', $tsAdmin->serverInfo()));
+			$command->update_activity();
 
 			if($config['functions_addRank']['on'] == true) {
-				$funkcja->addRank();
+				$command->addRank();
 			}
 
 			if($config['functions_aktualna_data']['on'] == true) {
-				$funkcja->aktualna_data();
+				$command->aktualna_data();
 			}
 
 			if($config['functions_aktualnie_online']['on'] == true) {
-				$funkcja->aktualnie_online();
+				$command->aktualnie_online();
 			}
 
 			if($config['functions_anty_vpn']['on'] == true) {
-				$funkcja->anty_vpn();
+				$command->anty_vpn();
 			}
 
 			if($config['functions_cleanChannel']['on'] == true) {
-				$funkcja->cleanChannel();
+				$command->cleanChannel();
 			}
 
 			if($config['functions_channelCreate']['on'] == true) {
-				$funkcja->channelCreate();
+				$command->channelCreate();
 			}
+
 			if($config['functions_channelNumber']['on'] == true) {
-				$funkcja->channelNumber();
+				$command->channelNumber();
 			}
 
 			if($config['functions_delRank']['on'] == true) {
-				$funkcja->delRank();
+				$command->delRank();
 			}
 
 			if($config['functions_groupOnline']['on'] == true) {
-				$funkcja->groupOnline();
+				$command->groupOnline();
+			}
+
+			if($config['functions_moveAfk']['on'] == true) {
+				$command->moveAfk();
+			}
+
+			if($config['functions_newUser']['on'] == true) {
+				$command->newUser();
 			}
 
 			if($config['functions_register']['on'] == true) {
-				$funkcja->register();
+				$command->register();
 			}
 
 			if($config['functions_rekord_online']['on'] == true) {
-				$funkcja->rekord_online();
+				$command->rekord_online();
 			}
 
 			if($config['functions_sendAd']['on'] == true) {
-				$funkcja->sendAd();
+				$command->sendAd();
 			}
 
 			if($config['functions_servername']['on'] == true) {
-				$funkcja->servername();
+				$command->servername();
 			}
 
 			if($config['functions_sprchannel']['on'] == true) {
-				$funkcja->sprchannel();
+				$command->sprchannel();
 			}
 
 			if($config['functions_sprnick']['on'] == true) {
-				$funkcja->sprnick();
+				$command->sprnick();
 			}
 
 			if($config['functions_statusTwitch']['on'] == true) {
-				$funkcja->statusTwitch();
+				$command->statusTwitch();
 			}
 			
 			if($config['functions_statusYt']['on'] == true) {
-				$funkcja->statusYt();
+				$command->statusYt();
 			}
 
 			if($config['functions_poke']['on'] == true) {
-				$funkcja->poke();
+				$command->poke();
 			}
 
 			if($config['functions_top_activity_time']['on'] == true) {
-				$funkcja->top_activity_time();
+				$command->top_activity_time();
 			}
 
 			if($config['functions_top_connections']['on'] == true) {
-				$funkcja->top_connections();
+				$command->top_connections();
 			}
 
 			if($config['functions_top_longest_connection']['on'] == true) {
-				$funkcja->top_longest_connection();
+				$command->top_longest_connection();
 			}
 
 			if($config['functions_welcome_messege']['on'] == true) {
-				$funkcja->welcome_messege();
+				$command->welcome_messege();
 			}
 			sleep(1);
-		}while($whoami['virtualserver_status'] == 'online');
+		}while(!empty($whoami));
 	}else{
-		$funkcja->log(1, 'Connection could not be established.');
+		$command->log(1, 'Connection could not be established.');
 	}
 	$tsAdmin->logout();
 ?>
