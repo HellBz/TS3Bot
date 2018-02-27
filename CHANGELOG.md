@@ -6,6 +6,9 @@
 *Dodatkowa konfiguracja bota w config.php
 *Poprawka kilku błedów złgoszonych przez Bloodthirster 
 
+Aktualizacja wymaga ponownego konfigurowania bota lub dodanie brakujących opcji w configu oraz wykonania pliku update.php.
+Wystarczy wpisać php update.php.
+
 ## [2.3.4] - 15.12.2017
 * Zmiana funkcji admins_ts_online() na groupOnline()
 * Poprawienie kilku drobnych błędów.
