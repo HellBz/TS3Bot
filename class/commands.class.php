@@ -644,17 +644,23 @@
 					if($this->cenzor($cl['channel_name'], 0) == true){
 						$delete = 1;
 					}else{
+						$is = 0;
 						foreach($channellist as $cl2){
-							if($cl2['pid'] == $cl['cid'] && $this->cenzor($cl2['channel_name'], 0) == true){
-								$delete = 1;
-								$sub = $cl2['cid'];
+							if($cl2['pid'] == $cl['cid']){
+								$is++;
+								if($this->cenzor($cl2['channel_name'], 0) == true){
+									$delete = 1;
+									$sub[$is] = $cl2['cid'];
+								}
 							}
 						}
 					}
 					if($delete == 1){
 						if($this->config['functions_sprchannel']['setting'] == 0){
 							if(!empty($sub)){
-								Functions::$tsAdmin->channelEdit($sub, array('channel_name' => $this->config['functions_sprchannel']['new_name']));
+								foreach($sub as $key => $value){
+									Functions::$tsAdmin->channelEdit($value, array('channel_name' => $key.' '.$this->config['functions_sprchannel']['new_name']));
+								}
 							}else{
 								Functions::$tsAdmin->channelEdit($cl['cid'], array('channel_name' => $i.' .'.$this->config['functions_sprchannel']['new_name']));
 							}
