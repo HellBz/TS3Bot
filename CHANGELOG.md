@@ -1,10 +1,10 @@
 # Changelog
 ## [2.7.0] - 27.02.2017
-*Rozbicie funkcji na dwa pliki.
-*Dodano funckję moveAfk() do przenoszenia osób nieaktywnych na kanał o podanym ID
-*Dodano funkcję newUser(), która w opisie kanału ustawia osoby zarejestrowane w przeciągu 24h (Czas można ustawić w configu).
-*Dodatkowa konfiguracja bota w config.php
-*Poprawka kilku błedów złgoszonych przez Bloodthirster 
+* Rozbicie funkcji na dwa pliki.
+* Dodano funckję moveAfk() do przenoszenia osób nieaktywnych na kanał o podanym ID
+* Dodano funkcję newUser(), która w opisie kanału ustawia osoby zarejestrowane w przeciągu 24h (Czas można ustawić w configu).
+* Dodatkowa konfiguracja bota w config.php
+* Poprawka kilku błedów złgoszonych przez Bloodthirster 
 
 Aktualizacja wymaga ponownego konfigurowania bota lub dodanie brakujących opcji w configu oraz wykonania pliku update.php.
 Wystarczy wpisać php update.php.
