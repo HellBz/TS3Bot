@@ -1,4 +1,11 @@
 # Changelog
+## [2.7.0] - 27.02.2017
+*Rozbicie funkcji na dwa pliki.
+*Dodano funckję moveAfk() do przenoszenia osób nieaktywnych na kanał o podanym ID
+*Dodano funkcję newUser(), która w opisie kanału ustawia osoby zarejestrowane w przeciągu 24h (Czas można ustawić w configu).
+*Dodatkowa konfiguracja bota w config.php
+*Poprawka kilku błedów złgoszonych przez Bloodthirster 
+
 ## [2.3.4] - 15.12.2017
 * Zmiana funkcji admins_ts_online() na groupOnline()
 * Poprawienie kilku drobnych błędów.
