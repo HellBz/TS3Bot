@@ -449,13 +449,15 @@
 		public function newUser(): void
 		{
 			$time = time() - $this->config['functions_newUser']['time'];
+			$i = 0;
 			$query = Functions::$db->query("SELECT `client_nickname`, `cui`, `cldbid` FROM `users` WHERE `regdate` >= {$time} ORDER BY `regdate` DESC");
 			while($row = $query->fetch()){
+				$i++;
 				$user_list[] = $this->getUrlName($row['cldbid'], $row['cui'], $row['client_nickname']);
 			}
 			$user_list = implode(', ', $user_list ?? []);
 			if($user_list != self::$olde_user_list){
-				Functions::$tsAdmin->channelEdit($this->config['functions_newUser']['cid'], array('channel_description' => Functions::$l->sprintf(Functions::$l->newUser_title, $user_list)));
+				Functions::$tsAdmin->channelEdit($this->config['functions_newUser']['cid'], ['channel_name' => Functions::$l->sprintf(Functions::$l->newUser_name, $i), 'channel_description' => Functions::$l->sprintf(Functions::$l->newUser_title, $user_list) ]);
 				self::$olde_user_list = $user_list;
 			}
 		}
@@ -663,6 +665,7 @@
 								}
 							}else{
 								Functions::$tsAdmin->channelEdit($cl['cid'], array('channel_name' => $i.' .'.$this->config['functions_sprchannel']['new_name']));
+								$this->log(2, 'Wyedytowano kanał za wulgarną nazwę: (channel name: '.$cl['channel_name'].') (channel id: '.$cl['cid'].')');
 							}
 						}else{
 							$this->channelDelete($i, $cl['cid']);
@@ -704,13 +707,14 @@
 				foreach($this->config['functions_statusTwitch']['cid_name'] as $cid => $name){
 					$jdc = json_decode($this->file_get_contents_curl('https://api.twitch.tv/kraken/streams/'.$name.'?client_id=56o6gfj3nakgeaaqpku3cugkf7lgzk'));
 					if($jdc->stream == null){
-						$channel_description = Functions::$l->sprintf(Functions::$l->offline_statusTwitch, $name);
+						$jdc2 = json_decode($this->file_get_contents_curl('https://api.twitch.tv/kraken/users/'.$name.'?client_id=56o6gfj3nakgeaaqpku3cugkf7lgzk'));
+						$channel_description = Functions::$l->sprintf(Functions::$l->offline_statusTwitch, $name, $jdc2->logo);
 						$channelinfo = Functions::$tsAdmin->getElement('data', Functions::$tsAdmin->channelInfo($cid));
 						if($channelinfo['channel_description'] != $channel_description){
 							Functions::$tsAdmin->channelEdit($cid, array('channel_description' => $channel_description));
 						}
 					}else{
-						$channel_description = Functions::$l->sprintf(Functions::$l->online_statusTwitch, $jdc->stream->channel->url, $name, $jdc->stream->game, $jdc->stream->channel->status, $jdc->stream->viewers, $jdc->stream->preview->medium);
+						$channel_description = Functions::$l->sprintf(Functions::$l->online_statusTwitch, $jdc->stream->channel->url, $name, $jdc->stream->game, $jdc->stream->channel->status, $jdc->stream->viewers, $jdc->stream->channel->logo);
 						Functions::$tsAdmin->channelEdit($cid, array('channel_description' => $channel_description));
 					}
 				}
@@ -731,7 +735,7 @@
 					self::$statusYt_description[$cid] = self::$statusYt_description[$cid] ?? NULL;
 					$jdc = json_decode($this->file_get_contents_curl("https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id={$id}&key={$this->config['functions_statusYt']['key']}"));
 					if(!empty($jdc->items[0])){
-						$channel_description = Functions::$l->sprintf(Functions::$l->channel_description_statusYt, $jdc->items[0]->id, $jdc->items[0]->snippet->title, $jdc->items[0]->statistics->subscriberCount, $jdc->items[0]->statistics->viewCount, $jdc->items[0]->snippet->description);
+						$channel_description = Functions::$l->sprintf(Functions::$l->channel_description_statusYt, $jdc->items[0]->id, $jdc->items[0]->snippet->title, $jdc->items[0]->statistics->subscriberCount, $jdc->items[0]->statistics->viewCount, $jdc->items[0]->snippet->description, $jdc->items[0]->snippet->thumbnails->medium->url);
 						$channel_name = Functions::$l->sprintf(Functions::$l->channel_name_statusYt, $jdc->items[0]->snippet->title, $jdc->items[0]->statistics->subscriberCount);
 						Functions::$tsAdmin->channelEdit($cid, [ 'channel_name' => $channel_name ]);
 						if(self::$statusYt_description[$cid] != $channel_description){
@@ -743,6 +747,7 @@
 				self::$statusYt_time = time()+60;
 			}
 		}
+
 		/**
 		 * top_activity_time()
 		 * Funkcja ustawia w opisie kanału o podanym ID TOP 10 aktywnych użytkowników.
