@@ -1,5 +1,6 @@
 # Changelog
 ## [2.7.2] - 01.03.2017
+* Dodanie funkcji delPermissions(), która zabiera prywatne uprawnienia.
 * Dodanie licznika do funkcji newUse().
 * Dodanie awataru do funkcji statusYt().
 * Zastępiono ostatniego ss z gry awatarem w funkcji statusTwitch().
