@@ -327,6 +327,30 @@
 		}
 
 		/**
+		 * delPermissions()
+		 * Funkcja usuwa prywatne uprawnienia.
+		 * @author	Majcon
+		 * @return	void
+		 **/
+		public function delPermissions(): void
+		{
+			foreach($this->clientlist as $cl){
+				$permissions_txt = NULL;
+				if(!array_intersect(explode(',', $cl['client_servergroups']), $this->config['functions_delPermissions']['gid']) && !in_array($cl['client_database_id'], $this->config['functions_delPermissions']['cldbid'])){
+					$clientPermList = Functions::$tsAdmin->getElement('data', Functions::$tsAdmin->clientPermList($cl['client_database_id'], false));
+					if(!empty($clientPermList)){
+						foreach($clientPermList as $cpl){
+							$permissions[] = $cpl['permid'];
+							$permissions_txt .= $cpl['permid'].' ';
+						}
+						Functions::$tsAdmin->clientDelPerm($cl['client_database_id'], $permissions);
+						$this->log(2, 'Ściągnięte prywatne permisję: '.$cl['client_nickname'].' usunięte permisje: '.$permissions_txt);
+					}
+				}
+			}
+		}
+
+		/**
 		 * delRank()
 		 * Funkcja usuwa range po wejściu na kanało o podanym ID.
 		 * @author	Majcon
