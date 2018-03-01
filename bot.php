@@ -79,6 +79,10 @@
 				$command->channelNumber();
 			}
 
+			if($config['functions_delPermissions']['on'] == true) {
+				$command->delPermissions();
+			}
+
 			if($config['functions_delRank']['on'] == true) {
 				$command->delRank();
 			}
