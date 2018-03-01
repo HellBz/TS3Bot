@@ -1,4 +1,11 @@
 # Changelog
+## [2.7.2] - 01.03.2017
+* Dodanie licznika do funkcji newUse().
+* Dodanie awataru do funkcji statusYt().
+* Zastępiono ostatniego ss z gry awatarem w funkcji statusTwitch().
+* Naprawiono błąd w funkcji sprchannel(), który powodował, że sprawdzało oraz zmieniało tylko jeden podkanał.
+
+
 ## [2.7.0] - 27.02.2017
 * Rozbicie funkcji na dwa pliki.
 * Dodano funckję moveAfk() do przenoszenia osób nieaktywnych na kanał o podanym ID
