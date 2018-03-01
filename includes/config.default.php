@@ -118,7 +118,22 @@
 			'separator'		=> '. '											//Separator oddzielający nazwę kanału od numeru.
 
 		],
+	//delPermissions() Funkcja usuwa prywane permisje.
+		'functions_delPermissions' => [
 
+			'on'		=> false,											//true - włączona false - wyłączona
+			'gid'		=> [
+
+								0
+
+			],																//ID Grupy, którą ma pomijać.
+			'cldbid'	=> [
+
+								0
+
+			]																//Client database id użytkowników, których ma pomijać.
+
+		],
 	//delRank() Funkcja usuwa range po wejściu na kanało o podanym ID.
 		'functions_delRank' => [
 
