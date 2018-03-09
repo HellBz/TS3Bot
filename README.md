@@ -1,2 +1,1 @@
-TS3Bot
-Darmowy BOT na serwer TS3
+[![Build Status](https://travis-ci.org/Majcon94/TS3Bot.svg?branch=master)](https://travis-ci.org/Majcon94/TS3Bot)
