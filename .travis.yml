@@ -1,2 +1,4 @@
-sudo: false
-language: php
+  "sudo": false,
+  "language": "php",
+  "group": "stable",
+  "dist": "trusty"
