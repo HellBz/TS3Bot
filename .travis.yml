@@ -1,8 +1,0 @@
-language: php
-php:
-  - '7.1'
-  - '7.2'
-before_install:
-  - travis_retry composer self-update
-  - composer install
-script: phpunit --exclude-group FITS --bootstrap bot.php tests
