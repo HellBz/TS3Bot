@@ -1,5 +1,11 @@
 # Changelog
-## [2.7.2] - 01.03.2017
+## [2.8.0] - 12.04.2018
+* Dodanie funkcji delInfoChannel() funkcja ustawia w opisie kanału listę kanałów, które zostaną usunięte w najbliższym czasie.
+* Przebudowa funkcji poke() co sprawiło lepsze działanie oraz konfiguracje.
+* Naprawiono błąd, przez który ucinało topki.
+* Kilka drobnych poprawek oraz zmian w konfiguracji bota.
+
+## [2.7.2] - 01.03.2018
 * Dodanie funkcji delPermissions(), która zabiera prywatne uprawnienia.
 * Dodanie licznika do funkcji newUse().
 * Dodanie awataru do funkcji statusYt().
@@ -7,7 +13,7 @@
 * Naprawiono błąd w funkcji sprchannel(), który powodował, że sprawdzało oraz zmieniało tylko jeden podkanał.
 
 
-## [2.7.0] - 27.02.2017
+## [2.7.0] - 27.02.2018
 * Rozbicie funkcji na dwa pliki.
 * Dodano funckję moveAfk() do przenoszenia osób nieaktywnych na kanał o podanym ID
 * Dodano funkcję newUser(), która w opisie kanału ustawia osoby zarejestrowane w przeciągu 24h (Czas można ustawić w configu).
