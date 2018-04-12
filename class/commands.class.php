@@ -10,6 +10,8 @@
 
 		private static $groupOnline_time_edition = 0;
 
+		private static $delInfoChannel_list = NULL;
+
 		private static $aktualna_data = NULL;
 
 		private static $aktualnie_online = NULL;
@@ -18,9 +20,9 @@
 
 		private static $channelNumberTime = 0;
 
-		private static $czas_administracja_poke = [];
+		private static $time_users_poke = [];
 
-		private static $czas_informacji_poke = [];
+		private static $time_admin_poke = [];
 
 		private static $sendAd_time = 0;
 		
@@ -49,7 +51,7 @@
 
 		/**
 		 * addRank()
-		 * Funkcja dodaje range po wejściu na kanało o podanym ID.
+		 * Funkcja nadaje rangę o podanym ID gdy użytkownik wejdzie na kanał o podanym ID.
 		 * @author	Majcon
 		 * @return	void
 		 **/
@@ -85,7 +87,7 @@
 
 		/**
 		 * aktualnie_online()
-		 * Funkcja Funkcja ustawia aktualną liczbę osób online jako nazwa kanału o podanym ID.
+		 * Funkcja ustawia aktualną liczbę osób online jako nazwa kanału o podanym ID.
 		 * @author	Majcon
 		 * @return	void
 		 **/
@@ -108,7 +110,7 @@
 		{
 			$aktualnie_online = [];
 			foreach($this->clientlist as $cl){
-				if($cl['client_type'] == 0 && !in_array($cl['client_unique_identifier'], $this->config['functions_anty_vpn']['client_unique_identifier'])) {
+				if($cl['client_type'] == 0 && !in_array($cl['client_unique_identifier'], $this->config['functions_anty_vpn']['client_unique_identifier']) && !array_intersect(explode(',', $cl['client_servergroups']), explode(',', $this->config['functions_anty_vpn']['gid']))) {
 					$aktualnie_online[$cl['clid']] = $cl['connection_client_ip'];
 				}
 			}
@@ -122,6 +124,7 @@
 						while($row = $query->fetch()){
 							$count = $row['count'];
 							if($count != 0){
+								$proxy = $row['proxy'];
 								if($row['proxy'] == 3 || $row['time']+2592000 < time()){
 									$check = 1;
 								}
@@ -237,7 +240,7 @@
 								$editid = $id-1;
 								if(trim($chl['channel_topic']) == 'WOLNY'){
 									$data1 = [
-										'channel_name' => $editid.'. '.$ccl['client_nickname'],
+										'channel_name' => substr($editid.$this->config['functions_channelCreate']['separator'].$ccl['client_nickname'], 0, 40),
 										'channel_topic' => date('d.m.Y'),
 										'channel_description' => str_replace($search, $replace, $this->config['functions_channelCreate']['channel_description']),
 									];
@@ -264,7 +267,7 @@
 						if($zalozony == 0){
 							$data1 = [
 								'cpid' 						=> $this->config['functions_channelCreate']['pid'],
-								'channel_name'				=> $id.'. '.$ccl['client_nickname'],
+								'channel_name'				=> substr($id.$this->config['functions_channelCreate']['separator'].$ccl['client_nickname'], 0, 40),
 								'channel_description' 		=> str_replace($search, $replace, $this->config['functions_channelCreate']['channel_description']),
 								'channel_topic' 			=> date('d.m.Y'),
 							];
@@ -314,15 +317,40 @@
 								if(!empty($matches[2][0]) && $matches[2][0]{0} == trim($this->config['functions_channelNumber']['separator'])){
 									$matches[2][0] = trim(substr(trim($matches[2][0]), 1));
 								}
-								Functions::$tsAdmin->channelEdit($chl['cid'], ['channel_name' => $i.$this->config['functions_channelNumber']['separator'].$matches[2][0]]);
+								Functions::$tsAdmin->channelEdit($chl['cid'], ['channel_name' => substr($i.$this->config['functions_channelNumber']['separator'].$matches[2][0], 0, 40)]);
 							}
 						}else{
-							Functions::$tsAdmin->channelEdit($chl['cid'], ['channel_name' => $i.$this->config['functions_channelNumber']['separator'].$chl['channel_name']]);
-
+							Functions::$tsAdmin->channelEdit($chl['cid'], ['channel_name' => substr($i.$this->config['functions_channelNumber']['separator'].$chl['channel_name'], 0, 40)]);
 						}
 					}
 				}
 				self::$channelNumberTime = time()+10;
+			}
+		}
+
+		/**
+		 * delInfoChannel()
+		 * Funkcja ustawia w opisie kanały które zostaną usunięte w razie braku aktywności.
+		 * @author	Majcon
+		 * @return	void
+		 **/
+		public function delInfoChannel(): void
+		{
+			$channellist = Functions::$tsAdmin->getElement('data', Functions::$tsAdmin->channelList("-topic"));
+			$channel_list = NULL;
+			$czas_del = time()-$this->config['functions_delInfoChannel']['time']*86400;
+			foreach($channellist as $cl){
+				if($cl['pid'] == $this->config['functions_cleanChannel']['pid']){
+					if($cl['channel_topic'] != 'WOLNY'){
+						if(strtotime($cl['channel_topic']) <= $czas_del){
+							$channel_list .=  Functions::$l->sprintf(Functions::$l->delInfoChannel_row, $this->getUrlChannel($cl['cid'], $cl['channel_name']));
+						}
+					}
+				}
+			}
+			if($channel_list != self::$delInfoChannel_list){
+				Functions::$tsAdmin->channelEdit($this->config['functions_delInfoChannel']['cid'], ['channel_description' => Functions::$l->sprintf(Functions::$l->delInfoChannel_list, $channel_list)]);
+				self::$delInfoChannel_list = $channel_list;
 			}
 		}
 
@@ -494,76 +522,90 @@
 		 **/
 		public function poke(): void
 		{
-			$administracja_po_poke = [];
-			$admin_online = [];
-			foreach(self::$czas_administracja_poke as $key => $value){
+			$admin_after_poke = [];
+			foreach(self::$time_admin_poke as $key => $value){
 				if($value <= time()){
-					unset(self::$czas_administracja_poke[$key]);
+					unset(self::$time_admin_poke[$key]);
 				}else{
-					$administracja_po_poke[] = $key;
+					$admin_after_poke[] = $key;
 				}
 			}
-			foreach($this->config['functions_poke']['cid_gid'] as $channel => $value){
-				if(empty(self::$czas_informacji_poke[$channel][0])){
-					self::$czas_informacji_poke[$channel][1] = 0;
-					self::$czas_informacji_poke[$channel][0] = 0;
+			$user_after_poke = [];
+			foreach(self::$time_users_poke as $key => $value){
+				if($value <= time()){
+					unset(self::$time_users_poke[$key]);
+				}else{
+					$user_after_poke[] = $key;
 				}
+			}
+			foreach($this->config['functions_poke']['cid'] as $channel => $value){
 				$channelClientList = Functions::$tsAdmin->getElement('data', Functions::$tsAdmin->channelClientList($channel, '-groups -uid'));
 				if(!empty($channelClientList)){
+					$admin_online = [];
 					foreach($channelClientList as $ccl){
-						if(empty(array_intersect(explode(',', $ccl['client_servergroups']), $value))){
-							$online_na_kanale[] = $ccl['clid'];
-							$nicki[] =  $this->getUrlName($ccl['client_database_id'], $ccl['client_unique_identifier'], $ccl['client_nickname']);
+						if(empty(array_intersect(explode(',', $ccl['client_servergroups']), $value['gid']))){
+							$online_on_channel[] = $ccl['clid'];
+							$nick_msg[] =  $this->getUrlName($ccl['client_database_id'], $ccl['client_unique_identifier'], $ccl['client_nickname']);
+							$nick_poke[] =  $ccl['client_nickname'];
 						}else{
 							$admin_online[] = $ccl['clid'];
 						}
 					}
-					if(empty($admin_online)){
-						$lista_adminow = [];
-						foreach($this->clientlist as $cl) {
-							if(!empty(array_intersect(explode(',', $cl['client_servergroups']), $value))){
-								if(!in_array($cl['cid'], $this->config['functions_poke']['cidafk'])){
-									$lista_adminow[] = $cl['clid'];
-								}
-							}
+					$admin_list = [];
+					foreach($this->clientlist as $cl) {
+						if(!empty(array_intersect(explode(',', $cl['client_servergroups']), $value['gid'])) && empty(array_intersect(explode(',', $cl['client_servergroups']), $value['anty_gid'])) && !in_array($cl['cid'], $value['cidafk']) && (($value['input_muted'] == 1 && $cl['client_input_muted'] == 0) || $value['input_muted'] == 0) && (($value['output_muted'] == 1 && $cl['client_output_muted'] == 0) || $value['output_muted'] == 0) && (($value['away'] == 1 && $cl['client_away'] == 0) || $value['away'] == 0)){
+							$admin_list[] = $cl['clid'];
 						}
-						$administracja_poke = array_diff($lista_adminow, $administracja_po_poke);
-						if(!empty($administracja_poke)){
-							$nicki = implode(', ', $nicki);
-							foreach($administracja_poke as $ap){
-								if($this->config['functions_poke']['poke_message'] == 1){
-									Functions::$tsAdmin->clientPoke($ap, Functions::$l->sprintf(Functions::$l->success_admin_poke, $nicki));
-								}else{
-									Functions::$tsAdmin->sendMessage(1, $ap, Functions::$l->sprintf(Functions::$l->success_admin_poke, $nicki));
-								}
-								self::$czas_administracja_poke[$ap] = time()+$this->config['functions_poke']['admin_time'];
-							}
-							if(self::$czas_informacji_poke[$channel][0] == 0){
-								foreach($online_na_kanale as $onk){
-									Functions::$tsAdmin->sendMessage(1, $onk, Functions::$l->success_he_was_informed_poke);
-								}
-								self::$czas_informacji_poke[$channel][0] = 1;
-								self::$czas_informacji_poke[$channel][1] = time()+$this->config['functions_poke']['user_time'];
-							}	
-						}else{
-							if(self::$czas_informacji_poke[$channel][0] == 0){
-								foreach($online_na_kanale as $onk){
-									Functions::$tsAdmin->sendMessage(1, $onk, Functions::$l->error_admin_offline_poke);
-								}
-								self::$czas_informacji_poke[$channel][0] = 1;
-								self::$czas_informacji_poke[$channel][1] = time()+$this->config['functions_poke']['user_time'];
-							}
-						}
-					}else{
-						foreach($admin_online as $ao){
-							self::$czas_administracja_poke[$ao] = time()+$this->config['functions_poke']['admin_time'];
-						}
-						self::$czas_informacji_poke[$channel][0] = 1;
-						self::$czas_informacji_poke[$channel][1] = time()+$this->config['functions_poke']['user_time'];
 					}
-				}
-				if(self::$czas_informacji_poke[$channel][1] <= time()){
-					self::$czas_informacji_poke[$channel][0] = 0;
+					$user_to_poke = array_diff($online_on_channel, $user_after_poke);
+					if(empty($admin_online)){
+						if(!empty($admin_list)){
+							$admin_to_poke = array_diff($admin_list, $admin_after_poke);
+							if(!empty($admin_to_poke)){
+								$channelInfo = Functions::$tsAdmin->getElement('data', Functions::$tsAdmin->channelInfo($channel));
+								$channel =  $this->getUrlChannel($channel, $channelInfo['channel_name']);
+								$nick_poke = implode(', ', $nick_poke);
+								$nick_msg = implode(', ', $nick_msg);
+								foreach($admin_to_poke as $atp){
+									if($value['info_admin'] == 1){
+										Functions::$tsAdmin->clientPoke($atp, Functions::$l->sprintf(Functions::$l->success_admin_poke, $nick_poke));
+									}
+									Functions::$tsAdmin->sendMessage(1, $atp, Functions::$l->sprintf(Functions::$l->success_admin_msg, $nick_msg, $channel));
+									self::$time_admin_poke[$atp] = time()+$this->config['functions_poke']['admin_time'];
+								}
+								if(!empty($user_to_poke)){
+									foreach($user_to_poke as $utp){
+										if($value['info_user'] == 1){
+											Functions::$tsAdmin->clientPoke($utp, Functions::$l->success_he_was_informed_poke);
+										}else{
+											Functions::$tsAdmin->sendMessage(1, $utp, Functions::$l->success_he_was_informed_poke);
+										}
+										self::$time_users_poke[$utp] = time()+$this->config['functions_poke']['user_time'];
+									}
+								}
+							}else{
+								if(!empty($user_to_poke) && !empty($admin_list)){
+									foreach($user_to_poke as $utp){
+										if($value['info_user'] == 1){
+											Functions::$tsAdmin->clientPoke($utp, Functions::$l->error_admin_before_poke);
+										}else{
+											Functions::$tsAdmin->sendMessage(1, $utp, Functions::$l->error_admin_before_poke);
+										}
+										self::$time_users_poke[$utp] = time()+$this->config['functions_poke']['user_time'];
+									}
+								}
+							}
+						}else{
+							foreach($user_to_poke as $utp){
+								if($value['info_user'] == 1){
+									Functions::$tsAdmin->clientPoke($utp, Functions::$l->error_admin_offline_poke);
+								}else{
+									Functions::$tsAdmin->sendMessage(1, $utp, Functions::$l->error_admin_offline_poke);
+								}
+								self::$time_users_poke[$utp] = time()+$this->config['functions_poke']['user_time'];
+							}
+						}
+					}
 				}
 			}
 		}
@@ -581,12 +623,12 @@
 					$rangiexplode = explode(',', $cl['client_servergroups']);
 					if(!in_array($this->config['functions_register']['gidm'], $rangiexplode) && !in_array($this->config['functions_register']['gidk'], $rangiexplode)){
 						if($cl['cid'] == $this->config['functions_register']['cidm']){
-								Functions::$tsAdmin->serverGroupAddClient($this->config['functions_register']['gidm'], $cl['client_database_id']);
-								$this->log(2, 'Zarejestrowano nick name: '.$cl['client_nickname']);
+							Functions::$tsAdmin->serverGroupAddClient($this->config['functions_register']['gidm'], $cl['client_database_id']);
+							$this->log(2, 'Zarejestrowano nick name: '.$cl['client_nickname']);
 						}
 						if($cl['cid'] == $this->config['functions_register']['cidk']){
-								Functions::$tsAdmin->serverGroupAddClient($this->config['functions_register']['gidk'], $cl['client_database_id']);
-								$this->log(2, 'Zarejestrowano nick name: '.$cl['client_nickname']);
+							Functions::$tsAdmin->serverGroupAddClient($this->config['functions_register']['gidk'], $cl['client_database_id']);
+							$this->log(2, 'Zarejestrowano nick name: '.$cl['client_nickname']);
 						}
 					}
 				}
@@ -771,7 +813,6 @@
 				self::$statusYt_time = time()+60;
 			}
 		}
-
 		/**
 		 * top_activity_time()
 		 * Funkcja ustawia w opisie kanału o podanym ID TOP 10 aktywnych użytkowników.
@@ -793,13 +834,13 @@
 						$data = $this->przelicz_czas($row['time_activity'], 1);
 						$data = $this->wyswietl_czas($data, 1, 1, 1, 0, 0);
 						$nick = $this->getUrlName($row['cldbid'], $row['cui'], $row['client_nickname']);
-						$top .= "[SIZE=10][COLOR=#ff0000][B]{$s}.)[/B][/COLOR] {$nick} {$data}\n[/SIZE]";
+						$top .= Functions::$l->sprintf(Functions::$l->row_top_activity_time, $s, $nick, $data);
 					}
 					if($s >= $this->config['functions_top_activity_time']['limit']){
 						break;
 					}
 				}
-				Functions::$tsAdmin->channelEdit($this->config['functions_top_activity_time']['cid'], array('channel_description' => $top));
+				Functions::$tsAdmin->channelEdit($this->config['functions_top_activity_time']['cid'], array('channel_description' => Functions::$l->sprintf(Functions::$l->list_top_activity_time, $top)));
 				self::$top_activity_time = time()+60;
 			}
 		}
@@ -817,19 +858,19 @@
 			if(!empty($this->config['functions_top_connections']['cldbid'])){
 				$cldbid = implode(",", $this->config['functions_top_activity_time']['cldbid']);
 			}
-			$query = Functions::$db->query("SELECT `client_nickname`, `cui`, `cldbid`, `connections`, `gid` FROM `users` WHERE `cldbid` NOT IN({$cldbid}) ORDER BY `connections` DESC LIMIT {$this->config['functions_top_activity_time']['limit']}");
+			$query = Functions::$db->query("SELECT `client_nickname`, `cui`, `cldbid`, `connections`, `gid` FROM `users` WHERE `cldbid` NOT IN({$cldbid}) ORDER BY `connections` DESC");
 			while($row = $query->fetch()){
 				if(!array_intersect(explode(',', $row['gid']), $this->config['functions_top_activity_time']['gid'])){
 					$s++;
 					$nick = $this->getUrlName($row['cldbid'], $row['cui'], $row['client_nickname']);
-					$top .= "[SIZE=10][COLOR=#ff0000][B]{$s}.)[/B][/COLOR] {$nick} {$row['connections']}\n[/SIZE]";
+					$top .= Functions::$l->sprintf(Functions::$l->row_top_connections, $s, $nick, $row['connections']);
 				}
 				if($s >= $this->config['functions_top_activity_time']['limit']){
 					break;
 				}
 			}
 			if($top != self::$description_top_connections){
-				Functions::$tsAdmin->channelEdit($this->config['functions_top_connections']['cid'], array('channel_description' => $top));
+				Functions::$tsAdmin->channelEdit($this->config['functions_top_connections']['cid'], array('channel_description' => Functions::$l->sprintf(Functions::$l->list_top_connections, $top)));
 				self::$description_top_connections = $top;
 			}
 		}
@@ -848,21 +889,21 @@
 				if(!empty($this->config['functions_top_longest_connection']['cldbid'])){
 					$cldbid = implode(",", $this->config['functions_top_longest_connection']['cldbid']);
 				}
-				$query = Functions::$db->query("SELECT `client_nickname`, `cui`, `cldbid`, `longest_connection`, `gid` FROM `users` WHERE `cldbid` NOT IN({$cldbid}) ORDER BY `longest_connection` DESC LIMIT {$this->config['functions_top_activity_time']['limit']}");
+				$query = Functions::$db->query("SELECT `client_nickname`, `cui`, `cldbid`, `longest_connection`, `gid` FROM `users` WHERE `cldbid` NOT IN({$cldbid}) ORDER BY `longest_connection` DESC");
 				while($row = $query->fetch()){
 					if(!array_intersect(explode(',', $row['gid']), $this->config['functions_top_activity_time']['gid'])){
 						$s++;
 						$data = $this->przelicz_czas($row['longest_connection']/1000);
 						$data = $this->wyswietl_czas($data, 1, 1, 1, 0, 0);
 						$nick = $this->getUrlName($row['cldbid'], $row['cui'], $row['client_nickname']);
-						$top .= "[SIZE=10][COLOR=#ff0000][B]{$s}.)[/B][/COLOR] {$nick} {$data}\n[/SIZE]";
+						$top .= Functions::$l->sprintf(Functions::$l->row_top_longest_connection, $s, $nick, $data);
 					}
 					if($s >= $this->config['functions_top_activity_time']['limit']){
 						break;
 					}
 				}
 				if($top != self::$description_top_longest_connection){
-					Functions::$tsAdmin->channelEdit($this->config['functions_top_longest_connection']['cid'], array('channel_description' => $top));
+					Functions::$tsAdmin->channelEdit($this->config['functions_top_longest_connection']['cid'], array('channel_description' => Functions::$l->sprintf(Functions::$l->list_top_longest_connection, $top)));
 					self::$description_top_longest_connection = $top;
 				}
 				self::$edit_top_longest_connection = time()+300;
