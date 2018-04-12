@@ -74,9 +74,12 @@
 			if($config['functions_channelCreate']['on'] == true) {
 				$command->channelCreate();
 			}
-
 			if($config['functions_channelNumber']['on'] == true) {
 				$command->channelNumber();
+			}
+
+			if($config['functions_delInfoChannel']['on'] == true) {
+				$command->delInfoChannel();
 			}
 
 			if($config['functions_delPermissions']['on'] == true) {
@@ -151,7 +154,7 @@
 				$command->welcome_messege();
 			}
 			sleep(1);
-		}while(!empty($whoami));
+		}while($whoami['virtualserver_status'] == 'online');
 	}else{
 		$command->log(1, 'Connection could not be established.');
 	}
