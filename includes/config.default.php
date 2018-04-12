@@ -15,7 +15,7 @@
 		
 		'bot' => [
 		
-			'ver'		=> '272'											//Wersja bota.	
+			'ver'		=> '280'											//Wersja bota.	
 		
 		],
 
@@ -57,6 +57,7 @@
 				'6wZcPZcelLsaW7BBMjfDG+NHVAQ=', '6wZcPZcelLsaW7BBMjfDG+NHVAQ='
 
 			],																	//Unique identifier użytkownika, którego ma nie wyrzucać za VPN.
+			'gid'		=> '24,78,157',											//ID Group, które ma nie wyrzucać za VPN.
 			'key'		=> 'NTU4OnEzSmJZaENmWU1LcHJBYWw1VFN4enpVSGcwdkRFeHFs'	//Klucz do API można go uzyskać na stronie https://iphub.info/pricing
 
 		],
@@ -106,18 +107,30 @@
 								'channel_flag_semi_permanent'				=> 0,
 								'channel_needed_talk_power'					=> 0,
 
-			]																//Dodatkowe ustawienia podkanałów.
+			],																//Dodatkowe ustawienia podkanałów.
+			'separator'		=> '. '											//Separator oddzielający nazwę kanału od numeru.
 
 		],
 		
 	//channelNumber() Funkcja sprawdza i w razie, czego poprawia numer kanału.
 		'functions_channelNumber' => [
 
-			'on'		=> false,											//true - włączona false - wyłączona
-			'pid'		=> 1,												//Strefa, w której ma sprawdzać numery.
+			'on'			=> false,										//true - włączona false - wyłączona
+			'pid'			=> 1,											//Strefa, w której ma sprawdzać numery.
 			'separator'		=> '. '											//Separator oddzielający nazwę kanału od numeru.
 
 		],
+
+	//delInfoChannel() Funkcja ustawia w opisie kanału listę kanałów które zostana usunięte w najbliższym czasie.
+		'functions_delInfoChannel' => [
+
+			'on'		=> true,							//true - włączona false - wyłączona
+			'pid'		=> 1,								//Strefa, w której ma sprawdzać kanały do usunięcia.
+			'cid'		=> 2,								//ID kanału w którym ma ustawiać listę kanałów.
+			'time'		=> 6								//Czas, po którym ma ustawić kanał w opisie czyli jeżeli kanały są usuwane po 7 dniach można ustawić 6 wtedy jeżeli kanał jest nieaktywny dłużej niż 6 dni trafia do opisu..
+
+		],
+
 	//delPermissions() Funkcja usuwa prywane permisje.
 		'functions_delPermissions' => [
 
@@ -134,6 +147,7 @@
 			]																//Client database id użytkowników, których ma pomijać.
 
 		],
+
 	//delRank() Funkcja usuwa range po wejściu na kanało o podanym ID.
 		'functions_delRank' => [
 
@@ -217,30 +231,57 @@
 	//poke() Funkcja puka podane grupy jeżeli ktoś wbije na podany kanał.
 		'functions_poke' => [
 
-			'on'			=> false,								//true - włączona false - wyłączona
-			'cid_gid'		=> [
+			'on'			=> true,										//true - włączona false - wyłączona
+			'cid'		=> [
 
-				1 => [
-
-					2, 3, 4
+				1 => [														//ID Kanału, na który trzeba wejść, aby pukało admina.
+				
+					'gid'				=> [ 1, 2, 3 ],					//ID Grup, które ma pukać.
+					'info_admin'		=> 1,								//Czy oprócz wiadomości na PW ma jeszcze pukać admina 1 – Tak 0 – Nie.
+					'info_user'			=> 1,								//Czy ma informować graczy za pomocą poke czy msg.
+					'cidafk'			=> [ 4, 5 ],						//ID kanałów AFK, które wykluczają admina z poke
+					'anty_gid'			=> [ 6 ],							//ID grup, które wykluczają admina z poke.
+					'input_muted'		=> 1,								//Czy ma wykluczać admina gdy ma wyłączony mikrofon 1 - Tak 2 - Nie.
+					'output_muted'		=> 1,								//Czy ma wykluczać admina gdy ma wyłączony głośnik 1 - Tak 2 - Nie.
+					'away'				=> 1,								//Czy ma wykluczać admina gdy ma status AFK 1 - Tak 2 - Nie.
+					
 
 				],
+				
+				2 => [														//ID Kanału, na który trzeba wejść, aby pukało admina.
+				
+					'gid'				=> [ 1, 2, 3 ],					//ID Grup, które ma pukać.
+					'info_admin'		=> 1,								//Czy oprócz wiadomości na PW ma jeszcze pukać admina 1 – Tak 0 – Nie.
+					'info_user'			=> 1,								//Czy ma informować graczy za pomocą poke czy msg.
+					'cidafk'			=> [ 4, 5 ],						//ID kanałów AFK, które wykluczają admina z poke
+					'anty_gid'			=> [ 6 ],							//ID grup, które wykluczają admina z poke.
+					'input_muted'		=> 1,								//Czy ma wykluczać admina gdy ma wyłączony mikrofon 1 - Tak 2 - Nie.
+					'output_muted'		=> 1,								//Czy ma wykluczać admina gdy ma wyłączony głośnik 1 - Tak 2 - Nie.
+					'away'				=> 1,								//Czy ma wykluczać admina gdy ma status AFK 1 - Tak 2 - Nie.
 
-				5 => [
+					
 
-					6, 7, 8
+				],
+				
+				3 => [
+				
+					'gid'				=> [ 1, 2, 3 ],						//ID Grup, które ma pukać.
+					'info_admin'		=> 1,								//Czy oprócz wiadomości na PW ma jeszcze pukać admina 1 – Tak 0 – Nie.
+					'info_user'			=> 1,								//Czy ma informować graczy za pomocą poke czy msg.
+					'cidafk'			=> [ 4, 5 ],						//ID kanałów AFK, które wykluczają admina z poke
+					'anty_gid'			=> [ 6 ],							//ID grup, które wykluczają admina z poke.
+					'input_muted'		=> 1,								//Czy ma wykluczać admina gdy ma wyłączony mikrofon 1 - Tak 2 - Nie.
+					'output_muted'		=> 1,								//Czy ma wykluczać admina gdy ma wyłączony głośnik 1 - Tak 2 - Nie.
+					'away'				=> 1,								//Czy ma wykluczać admina gdy ma status AFK 1 - Tak 2 - Nie.
+
+					
 
 				]
 
-			],														//ID Kanału, na który trzeba wejść, aby zaczepiło podane grupy.
-			'cidafk' 		=> [
+			],
 
-				9, 10
-
-			],														//Kanały, na których administrator może być AFK.
-			'poke_message' => 1,									//Wybór czy bot ma pukać czy wysyłać prywatną wiadomość do administratora 1 - Poke 2 - Wiadomość PW
-			'admin_time'	=> 120,									//Czas, po którym ma pukać administratora ponownie.
-			'user_time' 	=> 120									//Czas, po którym ma ponownie informować użytkownika.
+			'admin_time'		=> 120,										//Czas, po który ma ponownie powiadomić admina.
+			'user_time'			=> 120										//Czas, po który ma ponownie powiadomić użytkownika.
 
 		],
 
@@ -381,7 +422,7 @@
 		'functions_top_longest_connection' => [
 
 			'on'		=> false,									//true - włączona false - wyłączona
-			'cid'		=> 1,									//ID kanału, w którym ma ustawiać TOP 10 połączeń z serwerem.
+			'cid'		=> 1,										//ID kanału, w którym ma ustawiać TOP 10 połączeń z serwerem.
 			'gid'		=> [
 
 								2, 3
