@@ -15,6 +15,10 @@
 	//channelDelete();
 	$lang['kick_channelDelete'] = "Usunięcie kanału";
 
+	//delInfoChannel();
+	$lang['delInfoChannel_row'] = "{1}\n";
+	$lang['delInfoChannel_list'] = "[CENTER][B][COLOR=#55aa00]Kanałów, które zostaną usunięte w przeciągu 24h w razie braku aktywności..[/COLOR][/B][/CENTER]\r\n\r\n{1}";
+
 	//groupOnline(); 
 	$lang['groupOnline_online'] = "[SIZE=10]{1} jest [COLOR=#00FF00][B]OnLine[/B][/COLOR] na kanale {2}[/SIZE]\n";
 	$lang['groupOnline_offline'] = "[SIZE=10]{1} jest [COLOR=#FF0000]Offline[/COLOR] od {2}[/SIZE]\n";
@@ -26,6 +30,7 @@
 	//poke();
 	$lang['error_admin_offline_poke'] = "Aktualnie nie ma administracji lub są zajęci";
 	$lang['success_admin_poke'] = "{1} potrzebuje Twojej pomocy";
+	$lang['success_admin_msg'] = "{1} potrzebuje Twojej pomocy na kanale {2}";
 	$lang['success_he_was_informed_poke'] = "Administracja została powiadomiona. Czekaj cierpliwie";
 	$lang['error_admin_before_poke'] = "Administracja została już wcześniej powiadomiona.Czekaj cierpliwie";
 	
@@ -43,6 +48,18 @@
 	//statusYt()
 	$lang['channel_description_statusYt'] = "[center][img]{6}[/img][/center]\n[size=14][color=#ff0000]Nazwa:[/color] [URL=https://www.youtube.com/channel/{1}]{2}[/URL]\n[color=#ff0000]Subskrypcji:[/color] {3}\n[color=#ff0000]Wyświetlenia:[/color] {4}\n[color=#ff0000]Opis:[/color] {5}[/size]";
 	$lang['channel_name_statusYt'] = "{1} ({2})";
+
+	//top_activity_time()
+	$lang['row_top_activity_time'] = "[SIZE=10][COLOR=#ff0000][B]{1}.)[/B][/COLOR] {2} {3}\n[/SIZE]";
+	$lang['list_top_activity_time'] = "{1}";
+
+	//top_connections()
+	$lang['row_top_connections'] = "[SIZE=10][COLOR=#ff0000][B]{1}.)[/B][/COLOR] {2} {3}\n[/SIZE]";
+	$lang['list_top_connections'] = "{1}";
+
+	//top_longest_connection()
+	$lang['row_top_longest_connection'] = "[SIZE=10][COLOR=#ff0000][B]{1}.)[/B][/COLOR] {2} {3}\n[/SIZE]";
+	$lang['list_top_longest_connection'] = "{1}";
 
 	//wyswietl_czas();
 	$lang['time_d1_wyswietl_czas'] = "dnień";
