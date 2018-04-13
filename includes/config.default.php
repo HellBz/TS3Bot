@@ -241,9 +241,9 @@
 					'info_user'			=> 1,								//Czy ma informować graczy za pomocą poke czy msg.
 					'cidafk'			=> [ 4, 5 ],						//ID kanałów AFK, które wykluczają admina z poke
 					'anty_gid'			=> [ 6 ],							//ID grup, które wykluczają admina z poke.
-					'input_muted'		=> 1,								//Czy ma wykluczać admina gdy ma wyłączony mikrofon 1 - Tak 2 - Nie.
-					'output_muted'		=> 1,								//Czy ma wykluczać admina gdy ma wyłączony głośnik 1 - Tak 2 - Nie.
-					'away'				=> 1,								//Czy ma wykluczać admina gdy ma status AFK 1 - Tak 2 - Nie.
+					'input_muted'		=> 1,								//Czy ma wykluczać admina gdy ma wyłączony mikrofon 1 - Tak 0 - Nie.
+					'output_muted'		=> 1,								//Czy ma wykluczać admina gdy ma wyłączony głośnik 1 - Tak 0 - Nie.
+					'away'				=> 1,								//Czy ma wykluczać admina gdy ma status AFK 1 - Tak 0 - Nie.
 					
 
 				],
@@ -255,9 +255,9 @@
 					'info_user'			=> 1,								//Czy ma informować graczy za pomocą poke czy msg.
 					'cidafk'			=> [ 4, 5 ],						//ID kanałów AFK, które wykluczają admina z poke
 					'anty_gid'			=> [ 6 ],							//ID grup, które wykluczają admina z poke.
-					'input_muted'		=> 1,								//Czy ma wykluczać admina gdy ma wyłączony mikrofon 1 - Tak 2 - Nie.
-					'output_muted'		=> 1,								//Czy ma wykluczać admina gdy ma wyłączony głośnik 1 - Tak 2 - Nie.
-					'away'				=> 1,								//Czy ma wykluczać admina gdy ma status AFK 1 - Tak 2 - Nie.
+					'input_muted'		=> 1,								//Czy ma wykluczać admina gdy ma wyłączony mikrofon 1 - Tak 0 - Nie.
+					'output_muted'		=> 1,								//Czy ma wykluczać admina gdy ma wyłączony głośnik 1 - Tak 0 - Nie.
+					'away'				=> 1,								//Czy ma wykluczać admina gdy ma status AFK 1 - Tak 0 - Nie.
 
 					
 
@@ -270,9 +270,9 @@
 					'info_user'			=> 1,								//Czy ma informować graczy za pomocą poke czy msg.
 					'cidafk'			=> [ 4, 5 ],						//ID kanałów AFK, które wykluczają admina z poke
 					'anty_gid'			=> [ 6 ],							//ID grup, które wykluczają admina z poke.
-					'input_muted'		=> 1,								//Czy ma wykluczać admina gdy ma wyłączony mikrofon 1 - Tak 2 - Nie.
-					'output_muted'		=> 1,								//Czy ma wykluczać admina gdy ma wyłączony głośnik 1 - Tak 2 - Nie.
-					'away'				=> 1,								//Czy ma wykluczać admina gdy ma status AFK 1 - Tak 2 - Nie.
+					'input_muted'		=> 1,								//Czy ma wykluczać admina gdy ma wyłączony mikrofon 1 - Tak 0 - Nie.
+					'output_muted'		=> 1,								//Czy ma wykluczać admina gdy ma wyłączony głośnik 1 - Tak 0 - Nie.
+					'away'				=> 1,								//Czy ma wykluczać admina gdy ma status AFK 1 - Tak 0 - Nie.
 
 					
 
