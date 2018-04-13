@@ -88,8 +88,8 @@
 								'channel_maxclients'						=> '-1',
 								'channel_maxfamilyclients' 					=> '-1',
 								'channel_password' 							=> '',
-								'channel_codec'								=> 2,
-								'channel_codec_quality'						=> 7,
+								'channel_codec'								=> 4,
+								'channel_codec_quality'						=> 6,
 								'channel_flag_semi_permanent'				=> 0,
 								'channel_needed_talk_power'					=> 0,
 
@@ -102,13 +102,13 @@
 								'channel_maxclients' 						=> '-1',
 								'channel_maxfamilyclients'					=> '-1',
 								'channel_topic' 							=> '',
-								'channel_codec'								=> 2,
-								'channel_codec_quality'						=> 7,
+								'channel_codec'								=> 4,
+								'channel_codec_quality'						=> 6,
 								'channel_flag_semi_permanent'				=> 0,
 								'channel_needed_talk_power'					=> 0,
 
-			],																//Dodatkowe ustawienia podkanałów.
-			'separator'		=> '. '											//Separator oddzielający nazwę kanału od numeru.
+			],																	//Dodatkowe ustawienia podkanałów.
+			'separator'		=> '. '												//Separator oddzielający nazwę kanału od numeru.
 
 		],
 		
